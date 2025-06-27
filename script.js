@@ -172,14 +172,23 @@ class BJJWorkoutApp {
         if (!this.currentWorkout) return;
 
         this.isRunning = true;
-        this.currentPhase = 0;
-        this.currentExercise = 0;
+        
+        // Check if we're resuming from a pause or starting fresh
+        const isResuming = this.currentPhase > 0 || this.currentExercise > 0 || this.timeRemaining > 0;
+        
+        if (!isResuming) {
+            // Starting fresh - reset to beginning
+            this.currentPhase = 0;
+            this.currentExercise = 0;
+            this.startNextPhase();
+        } else {
+            // Resuming from pause - just restart the timer
+            this.startTimer();
+        }
         
         this.startBtn.textContent = 'Pause';
         this.startBtn.classList.remove('bg-green-500', 'hover:bg-green-600');
         this.startBtn.classList.add('bg-blue-500', 'hover:bg-blue-600');
-        
-        this.startNextPhase();
     }
 
     startNextPhase() {
@@ -192,7 +201,11 @@ class BJJWorkoutApp {
         }
 
         const phase = phases[this.currentPhase];
-        this.currentExercise = 0;
+        
+        // Only reset currentExercise if we're not resuming from a pause
+        if (this.timeRemaining <= 0) {
+            this.currentExercise = 0;
+        }
         
         this.timerLabelEl.textContent = phase.name;
         this.phaseInfoEl.textContent = `Phase ${this.currentPhase + 1} of ${phases.length}`;
@@ -211,7 +224,11 @@ class BJJWorkoutApp {
         }
 
         const exercise = phase.exercises[this.currentExercise];
-        this.timeRemaining = exercise.duration;
+        
+        // Only set timeRemaining if it's not already set (i.e., not resuming from pause)
+        if (this.timeRemaining <= 0) {
+            this.timeRemaining = exercise.duration;
+        }
         
         this.timerLabelEl.textContent = exercise.name;
         this.phaseInfoEl.textContent = `${phase.name} - ${this.currentExercise + 1}/${phase.exercises.length}`;
