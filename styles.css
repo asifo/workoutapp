@@ -1,0 +1,670 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    min-height: 100vh;
+    color: #333;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 30px;
+    color: white;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    font-weight: 700;
+}
+
+header h1 i {
+    color: #ffd700;
+    margin-right: 10px;
+}
+
+header p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    font-weight: 300;
+    margin-bottom: 15px;
+}
+
+.equipment-info {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.equipment-info span {
+    background: rgba(255,255,255,0.1);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.equipment-info i {
+    margin-right: 5px;
+    color: #ffd700;
+}
+
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+/* Workout Selector */
+.workout-selector {
+    background: white;
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.workout-selector h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #1e3c72;
+    font-size: 1.5rem;
+}
+
+.day-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 15px;
+}
+
+.day-btn {
+    padding: 20px 15px;
+    border: 2px solid #e0e0e0;
+    background: white;
+    border-radius: 15px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    text-align: center;
+    line-height: 1.3;
+}
+
+.day-btn:hover {
+    border-color: #1e3c72;
+    background: #f8f9ff;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(30,60,114,0.2);
+}
+
+.day-btn.active {
+    border-color: #1e3c72;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    color: white;
+    box-shadow: 0 5px 20px rgba(30,60,114,0.3);
+}
+
+.day-btn small {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 400;
+    opacity: 0.8;
+    margin-top: 5px;
+}
+
+/* Timer Section */
+.timer-section {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    text-align: center;
+}
+
+.timer-display {
+    margin-bottom: 25px;
+}
+
+.time-display {
+    font-size: 4rem;
+    font-weight: 700;
+    color: #1e3c72;
+    font-family: 'Courier New', monospace;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+.timer-label {
+    font-size: 1.3rem;
+    color: #666;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+.phase-info {
+    font-size: 1rem;
+    color: #888;
+    font-weight: 400;
+}
+
+.timer-controls {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+}
+
+.control-btn {
+    padding: 15px 30px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    min-width: 120px;
+}
+
+.control-btn.primary {
+    background: #28a745;
+    color: white;
+}
+
+.control-btn.primary:hover {
+    background: #218838;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(40,167,69,0.3);
+}
+
+.control-btn.secondary {
+    background: #17a2b8;
+    color: white;
+}
+
+.control-btn.secondary:hover {
+    background: #138496;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(23,162,184,0.3);
+}
+
+.control-btn.danger {
+    background: #dc3545;
+    color: white;
+}
+
+.control-btn.danger:hover {
+    background: #c82333;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(220,53,69,0.3);
+}
+
+.control-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* Progress Section */
+.progress-section {
+    margin-top: 20px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 12px;
+    background: #f0f0f0;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #28a745, #20c997);
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    font-size: 0.9rem;
+    color: #666;
+    font-weight: 500;
+}
+
+/* Workout Details */
+.workout-details {
+    background: white;
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.workout-overview h3 {
+    color: #1e3c72;
+    margin-bottom: 15px;
+    font-size: 1.3rem;
+}
+
+.workout-overview p {
+    color: #666;
+    line-height: 1.6;
+}
+
+.workout-phase {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 15px 0;
+    border-left: 4px solid #1e3c72;
+}
+
+.workout-phase h4 {
+    color: #1e3c72;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+}
+
+.workout-phase ul {
+    list-style: none;
+    padding: 0;
+}
+
+.workout-phase li {
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.workout-phase li:last-child {
+    border-bottom: none;
+}
+
+.exercise-name {
+    font-weight: 500;
+    color: #333;
+}
+
+.exercise-details {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* Exercise Guide */
+.exercise-guide {
+    background: white;
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.exercise-guide h3 {
+    color: #1e3c72;
+    margin-bottom: 20px;
+    font-size: 1.3rem;
+}
+
+.exercise-guide h3 i {
+    margin-right: 10px;
+    color: #ffd700;
+}
+
+.exercise-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.exercise-card {
+    background: #f8f9fa;
+    border-radius: 15px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.exercise-card:hover {
+    border-color: #1e3c72;
+    background: white;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(30,60,114,0.1);
+}
+
+.exercise-card h4 {
+    color: #1e3c72;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+}
+
+.exercise-card p {
+    color: #666;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 10px;
+}
+
+.exercise-card .exercise-type {
+    display: inline-block;
+    background: #1e3c72;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+/* Settings Panel */
+.settings-panel {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.settings-btn {
+    background: white;
+    border: none;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    cursor: pointer;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    font-size: 1.5rem;
+    transition: all 0.3s ease;
+    color: #1e3c72;
+}
+
+.settings-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+}
+
+.settings-content {
+    position: absolute;
+    bottom: 80px;
+    right: 0;
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    min-width: 280px;
+}
+
+.settings-content h3 {
+    margin-bottom: 15px;
+    color: #1e3c72;
+}
+
+.setting-group {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.setting-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    color: #333;
+}
+
+.setting-group input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+}
+
+.setting-group select {
+    padding: 8px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    background: white;
+    font-size: 0.9rem;
+}
+
+/* Modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 20px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 25px 25px 0;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 20px;
+}
+
+.modal-header h3 {
+    color: #1e3c72;
+    font-size: 1.3rem;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: #666;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-btn:hover {
+    color: #1e3c72;
+}
+
+.modal-body {
+    padding: 0 25px 25px;
+}
+
+.exercise-video {
+    margin-bottom: 20px;
+}
+
+.video-placeholder {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 40px;
+    text-align: center;
+    color: #666;
+    border: 2px dashed #ddd;
+}
+
+.video-placeholder i {
+    font-size: 3rem;
+    color: #1e3c72;
+    margin-bottom: 10px;
+}
+
+.exercise-description {
+    margin-bottom: 20px;
+    line-height: 1.6;
+    color: #333;
+}
+
+.exercise-cues h4 {
+    color: #1e3c72;
+    margin-bottom: 10px;
+}
+
+.exercise-cues ul {
+    list-style: none;
+    padding: 0;
+}
+
+.exercise-cues li {
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+    color: #666;
+}
+
+.exercise-cues li:last-child {
+    border-bottom: none;
+}
+
+.exercise-cues li:before {
+    content: "•";
+    color: #1e3c72;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+/* Animations */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.timer-display.running {
+    animation: pulse 2s infinite;
+}
+
+@keyframes workoutComplete {
+    0% { background: #28a745; }
+    50% { background: #ffd700; }
+    100% { background: #28a745; }
+}
+
+.timer-display.complete {
+    animation: workoutComplete 1s ease-in-out;
+}
+
+/* Utility Classes */
+.hidden {
+    display: none !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+    
+    header h1 {
+        font-size: 2rem;
+    }
+    
+    .equipment-info {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .day-buttons {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    }
+    
+    .time-display {
+        font-size: 3rem;
+    }
+    
+    .timer-controls {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .control-btn {
+        width: 200px;
+    }
+    
+    .exercise-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .settings-content {
+        right: -50px;
+        min-width: 250px;
+    }
+}
+
+@media (max-width: 480px) {
+    .time-display {
+        font-size: 2.5rem;
+    }
+    
+    .control-btn {
+        width: 100%;
+        max-width: 200px;
+    }
+    
+    .day-btn {
+        padding: 15px 10px;
+        font-size: 0.9rem;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: 10px;
+    }
+}
+
+/* Workout-specific styling */
+.workout-active {
+    background: linear-gradient(135deg, #28a745, #20c997) !important;
+    color: white !important;
+}
+
+.workout-rest {
+    background: linear-gradient(135deg, #17a2b8, #6f42c1) !important;
+    color: white !important;
+}
+
+.workout-warmup {
+    background: linear-gradient(135deg, #ffc107, #fd7e14) !important;
+    color: white !important;
+}
+
+.workout-cooldown {
+    background: linear-gradient(135deg, #6c757d, #495057) !important;
+    color: white !important;
+} 
