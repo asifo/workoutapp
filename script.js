@@ -31,7 +31,6 @@ class BJJWorkoutApp {
 
         // Control buttons
         this.startBtn = document.getElementById('start-timer');
-        this.pauseBtn = document.getElementById('pause-timer');
         this.resetBtn = document.getElementById('reset-timer');
 
         // Day selection
@@ -70,7 +69,6 @@ class BJJWorkoutApp {
 
         // Timer controls
         this.startBtn.addEventListener('click', () => this.toggleWorkout());
-        this.pauseBtn.addEventListener('click', () => this.pauseWorkout());
         this.resetBtn.addEventListener('click', () => this.resetWorkout());
 
         // Settings
@@ -93,7 +91,14 @@ class BJJWorkoutApp {
         
         // Update active button
         this.dayButtons.forEach(btn => {
-            btn.classList.toggle('active', parseInt(btn.dataset.day) === day);
+            const isActive = parseInt(btn.dataset.day) === day;
+            if (isActive) {
+                btn.classList.remove('border-gray-200', 'bg-white', 'hover:border-bjj-blue', 'hover:bg-blue-50');
+                btn.classList.add('border-bjj-blue', 'bg-gradient-to-br', 'from-bjj-blue', 'to-bjj-light-blue', 'text-white', 'shadow-lg');
+            } else {
+                btn.classList.remove('border-bjj-blue', 'bg-gradient-to-br', 'from-bjj-blue', 'to-bjj-light-blue', 'text-white', 'shadow-lg');
+                btn.classList.add('border-gray-200', 'bg-white', 'hover:border-bjj-blue', 'hover:bg-blue-50');
+            }
         });
 
         // Update workout details
@@ -109,18 +114,18 @@ class BJJWorkoutApp {
         const workout = this.currentWorkout;
         this.workoutDetailsEl.innerHTML = `
             <div class="workout-overview">
-                <h3>${workout.name}</h3>
-                <p><strong>Focus:</strong> ${workout.focus}</p>
-                <p><strong>Duration:</strong> ${workout.duration} minutes</p>
+                <h3 class="text-bjj-blue mb-4 text-xl font-semibold">${workout.name}</h3>
+                <p class="text-gray-600 leading-relaxed mb-3"><strong>Focus:</strong> ${workout.focus}</p>
+                <p class="text-gray-600 leading-relaxed mb-4"><strong>Duration:</strong> ${workout.duration} minutes</p>
             </div>
             ${workout.phases.map((phase, index) => `
-                <div class="workout-phase">
-                    <h4>${index + 1}. ${phase.name} (${phase.duration} min)</h4>
-                    <ul>
+                <div class="bg-gray-50 rounded-xl p-5 my-4 border-l-4 border-bjj-blue">
+                    <h4 class="text-bjj-blue mb-3 text-lg font-semibold">${index + 1}. ${phase.name} (${phase.duration} min)</h4>
+                    <ul class="list-none p-0">
                         ${phase.exercises.map(exercise => `
-                            <li>
-                                <span class="exercise-name">${exercise.name}</span>
-                                <span class="exercise-details">${exercise.duration}s - ${exercise.description}</span>
+                            <li class="py-2 border-b border-gray-200 flex justify-between items-center last:border-b-0">
+                                <span class="font-medium text-gray-800">${exercise.name}</span>
+                                <span class="text-gray-600 text-sm">${exercise.duration}s - ${exercise.description}</span>
                             </li>
                         `).join('')}
                     </ul>
@@ -132,10 +137,10 @@ class BJJWorkoutApp {
     populateExerciseLibrary() {
         const exercises = this.getExerciseLibrary();
         this.exerciseGridEl.innerHTML = Object.entries(exercises).map(([name, data]) => `
-            <div class="exercise-card" onclick="app.showExerciseModal('${name}')">
-                <h4>${name}</h4>
-                <p>${data.description}</p>
-                <span class="exercise-type">${data.type}</span>
+            <div class="bg-gray-50 rounded-2xl p-5 cursor-pointer transition-all duration-300 border-2 border-transparent hover:border-bjj-blue hover:bg-white hover:-translate-y-1 hover:shadow-lg" onclick="app.showExerciseModal('${name}')">
+                <h4 class="text-bjj-blue mb-3 text-lg font-semibold">${name}</h4>
+                <p class="text-gray-600 text-sm leading-relaxed mb-3">${data.description}</p>
+                <span class="inline-block bg-bjj-blue text-white px-3 py-1 rounded-full text-xs font-medium">${data.type}</span>
             </div>
         `).join('');
     }
@@ -146,7 +151,7 @@ class BJJWorkoutApp {
 
         this.modalTitle.textContent = exerciseName;
         this.modalDescription.textContent = exercise.description;
-        this.modalCues.innerHTML = exercise.cues.map(cue => `<li>${cue}</li>`).join('');
+        this.modalCues.innerHTML = exercise.cues.map(cue => `<li class="py-2 border-b border-gray-200 text-gray-600 last:border-b-0 before:content-['•'] before:text-bjj-blue before:font-bold before:mr-3">${cue}</li>`).join('');
         
         this.modal.classList.remove('hidden');
     }
@@ -171,8 +176,8 @@ class BJJWorkoutApp {
         this.currentExercise = 0;
         
         this.startBtn.textContent = 'Pause';
-        this.startBtn.classList.remove('primary');
-        this.startBtn.classList.add('secondary');
+        this.startBtn.classList.remove('bg-green-500', 'hover:bg-green-600');
+        this.startBtn.classList.add('bg-blue-500', 'hover:bg-blue-600');
         
         this.startNextPhase();
     }
@@ -259,8 +264,8 @@ class BJJWorkoutApp {
         }
         
         this.startBtn.textContent = 'Resume';
-        this.startBtn.classList.remove('secondary');
-        this.startBtn.classList.add('primary');
+        this.startBtn.classList.remove('bg-blue-500', 'hover:bg-blue-600');
+        this.startBtn.classList.add('bg-green-500', 'hover:bg-green-600');
     }
 
     resetWorkout() {
@@ -291,8 +296,8 @@ class BJJWorkoutApp {
         this.progressFillEl.style.width = '100%';
         
         this.startBtn.textContent = 'Start Workout';
-        this.startBtn.classList.remove('secondary');
-        this.startBtn.classList.add('primary');
+        this.startBtn.classList.remove('bg-blue-500', 'hover:bg-blue-600');
+        this.startBtn.classList.add('bg-green-500', 'hover:bg-green-600');
         
         this.notify();
     }

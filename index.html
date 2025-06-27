@@ -4,107 +4,145 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BJJ Kettlebell Conditioning - 30-Min Daily Routine</title>
-    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'bjj-blue': '#1e3c72',
+                        'bjj-light-blue': '#2a5298',
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body>
-    <div class="container">
-        <header>
-            <h1><i class="fas fa-dumbbell"></i> BJJ Kettlebell Conditioning</h1>
-            <p>30-Minute Daily Routine for Elite BJJ Performance</p>
-            <div class="equipment-info">
-                <span><i class="fas fa-weight-hanging"></i> 35lb Kettlebell</span>
-                <span><i class="fas fa-clock"></i> 30 Min Daily</span>
-                <span><i class="fas fa-heart"></i> BJJ-Specific</span>
+<body class="font-inter bg-gradient-to-br from-bjj-blue to-bjj-light-blue min-h-screen text-gray-800 leading-relaxed">
+    <div class="max-w-6xl mx-auto p-5 min-h-screen flex flex-col">
+        <header class="text-center mb-8 text-white">
+            <h1 class="text-4xl md:text-5xl mb-3 font-bold drop-shadow-lg">
+                <i class="fas fa-dumbbell text-yellow-400 mr-3"></i> BJJ Kettlebell Conditioning
+            </h1>
+            <p class="text-lg opacity-90 font-light mb-4">30-Minute Daily Routine for Elite BJJ Performance</p>
+            <div class="flex justify-center gap-5 flex-wrap">
+                <span class="bg-white/10 px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm border border-white/20">
+                    <i class="fas fa-weight-hanging text-yellow-400 mr-2"></i> 35lb Kettlebell
+                </span>
+                <span class="bg-white/10 px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm border border-white/20">
+                    <i class="fas fa-clock text-yellow-400 mr-2"></i> 30 Min Daily
+                </span>
+                <span class="bg-white/10 px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm border border-white/20">
+                    <i class="fas fa-heart text-yellow-400 mr-2"></i> BJJ-Specific
+                </span>
             </div>
         </header>
 
-        <div class="main-content">
+        <div class="flex-1 flex flex-col gap-6">
             <!-- Workout Selection -->
-            <div class="workout-selector">
-                <h2>Today's Workout</h2>
-                <div class="day-buttons">
-                    <button class="day-btn" data-day="1">Day 1<br><small>Snatch Intervals</small></button>
-                    <button class="day-btn" data-day="2">Day 2<br><small>EMOM Circuit</small></button>
-                    <button class="day-btn" data-day="3">Day 3<br><small>Aerobic + Core</small></button>
-                    <button class="day-btn" data-day="4">Day 4<br><small>Power Complex</small></button>
-                    <button class="day-btn" data-day="5">Day 5<br><small>AMRAP Rounds</small></button>
-                    <button class="day-btn" data-day="6">Day 6<br><small>BJJ Training</small></button>
-                    <button class="day-btn" data-day="7">Day 7<br><small>Rest Day</small></button>
+            <div class="bg-white rounded-3xl p-6 shadow-2xl">
+                <h2 class="text-center mb-5 text-bjj-blue text-2xl font-semibold">Today's Workout</h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+                    <button class="day-btn p-5 border-2 border-gray-200 bg-white rounded-2xl cursor-pointer font-semibold text-base transition-all duration-300 text-center leading-tight hover:border-bjj-blue hover:bg-blue-50 hover:-translate-y-1 hover:shadow-lg" data-day="1">
+                        Day 1<br><small class="block text-sm font-normal opacity-80 mt-1">Snatch Intervals</small>
+                    </button>
+                    <button class="day-btn p-5 border-2 border-gray-200 bg-white rounded-2xl cursor-pointer font-semibold text-base transition-all duration-300 text-center leading-tight hover:border-bjj-blue hover:bg-blue-50 hover:-translate-y-1 hover:shadow-lg" data-day="2">
+                        Day 2<br><small class="block text-sm font-normal opacity-80 mt-1">EMOM Circuit</small>
+                    </button>
+                    <button class="day-btn p-5 border-2 border-gray-200 bg-white rounded-2xl cursor-pointer font-semibold text-base transition-all duration-300 text-center leading-tight hover:border-bjj-blue hover:bg-blue-50 hover:-translate-y-1 hover:shadow-lg" data-day="3">
+                        Day 3<br><small class="block text-sm font-normal opacity-80 mt-1">Aerobic + Core</small>
+                    </button>
+                    <button class="day-btn p-5 border-2 border-gray-200 bg-white rounded-2xl cursor-pointer font-semibold text-base transition-all duration-300 text-center leading-tight hover:border-bjj-blue hover:bg-blue-50 hover:-translate-y-1 hover:shadow-lg" data-day="4">
+                        Day 4<br><small class="block text-sm font-normal opacity-80 mt-1">Power Complex</small>
+                    </button>
+                    <button class="day-btn p-5 border-2 border-gray-200 bg-white rounded-2xl cursor-pointer font-semibold text-base transition-all duration-300 text-center leading-tight hover:border-bjj-blue hover:bg-blue-50 hover:-translate-y-1 hover:shadow-lg" data-day="5">
+                        Day 5<br><small class="block text-sm font-normal opacity-80 mt-1">AMRAP Rounds</small>
+                    </button>
+                    <button class="day-btn p-5 border-2 border-gray-200 bg-white rounded-2xl cursor-pointer font-semibold text-base transition-all duration-300 text-center leading-tight hover:border-bjj-blue hover:bg-blue-50 hover:-translate-y-1 hover:shadow-lg" data-day="6">
+                        Day 6<br><small class="block text-sm font-normal opacity-80 mt-1">BJJ Training</small>
+                    </button>
+                    <button class="day-btn p-5 border-2 border-gray-200 bg-white rounded-2xl cursor-pointer font-semibold text-base transition-all duration-300 text-center leading-tight hover:border-bjj-blue hover:bg-blue-50 hover:-translate-y-1 hover:shadow-lg" data-day="7">
+                        Day 7<br><small class="block text-sm font-normal opacity-80 mt-1">Rest Day</small>
+                    </button>
                 </div>
             </div>
 
             <!-- Timer Display -->
-            <div class="timer-section">
-                <div class="timer-display">
-                    <div class="time-display" id="time-display">
+            <div class="bg-white rounded-3xl p-8 shadow-2xl text-center">
+                <div class="mb-6">
+                    <div class="text-6xl md:text-7xl font-bold text-bjj-blue font-mono mb-3 drop-shadow-md" id="time-display">
                         <span id="minutes">00</span>:<span id="seconds">00</span>
                     </div>
-                    <div class="timer-label" id="timer-label">Select a workout</div>
-                    <div class="phase-info" id="phase-info"></div>
+                    <div class="text-xl text-gray-600 font-medium mb-3" id="timer-label">Select a workout</div>
+                    <div class="text-base text-gray-500 font-normal" id="phase-info"></div>
                 </div>
 
                 <!-- Timer Controls -->
-                <div class="timer-controls">
-                    <button class="control-btn primary" id="start-timer">Start Workout</button>
-                    <button class="control-btn secondary" id="pause-timer">Pause</button>
-                    <button class="control-btn danger" id="reset-timer">Reset</button>
+                <div class="flex gap-4 justify-center mb-6 flex-wrap">
+                    <button class="control-btn bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-xl font-semibold text-base transition-all duration-300 min-w-32 hover:-translate-y-1 hover:shadow-lg" id="start-timer">Start Workout</button>
+                    <button class="control-btn bg-red-500 hover:bg-red-600 text-white px-8 py-4 rounded-xl font-semibold text-base transition-all duration-300 min-w-32 hover:-translate-y-1 hover:shadow-lg" id="reset-timer">Reset</button>
                 </div>
 
                 <!-- Progress Bar -->
-                <div class="progress-section">
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progress-fill"></div>
+                <div class="mt-5">
+                    <div class="w-full h-3 bg-gray-200 rounded-full overflow-hidden mb-3">
+                        <div class="h-full bg-gradient-to-r from-green-500 to-teal-400 w-0 transition-all duration-300" id="progress-fill"></div>
                     </div>
-                    <div class="progress-text" id="progress-text">Ready to begin</div>
+                    <div class="text-sm text-gray-600 font-medium" id="progress-text">Ready to begin</div>
                 </div>
             </div>
 
             <!-- Workout Details -->
-            <div class="workout-details" id="workout-details">
+            <div class="bg-white rounded-3xl p-6 shadow-2xl" id="workout-details">
                 <div class="workout-overview">
-                    <h3>Workout Overview</h3>
-                    <p>Select a day to see the complete workout plan.</p>
+                    <h3 class="text-bjj-blue mb-4 text-xl font-semibold">Workout Overview</h3>
+                    <p class="text-gray-600 leading-relaxed">Select a day to see the complete workout plan.</p>
                 </div>
             </div>
 
             <!-- Exercise Guide -->
-            <div class="exercise-guide">
-                <h3><i class="fas fa-book"></i> Exercise Library</h3>
-                <div class="exercise-grid" id="exercise-grid">
+            <div class="bg-white rounded-3xl p-6 shadow-2xl">
+                <h3 class="text-bjj-blue mb-5 text-xl font-semibold">
+                    <i class="fas fa-book text-yellow-400 mr-3"></i> Exercise Library
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="exercise-grid">
                     <!-- Exercises will be populated by JavaScript -->
                 </div>
             </div>
 
             <!-- Settings Panel -->
-            <div class="settings-panel">
-                <button class="settings-btn" id="settings-btn">
+            <div class="fixed bottom-5 right-5 z-50">
+                <button class="bg-white border-none rounded-full w-15 h-15 cursor-pointer shadow-lg text-2xl transition-all duration-300 text-bjj-blue hover:scale-110 hover:shadow-xl" id="settings-btn">
                     <i class="fas fa-cog"></i>
                 </button>
-                <div class="settings-content hidden" id="settings-content">
-                    <h3>Settings</h3>
-                    <div class="setting-group">
-                        <label>
-                            <input type="checkbox" id="sound-enabled" checked>
+                <div class="absolute bottom-20 right-0 bg-white rounded-2xl p-6 shadow-2xl min-w-72 hidden" id="settings-content">
+                    <h3 class="mb-4 text-bjj-blue font-semibold">Settings</h3>
+                    <div class="mb-4 flex items-center gap-3">
+                        <label class="flex items-center gap-2 cursor-pointer font-medium text-gray-800">
+                            <input type="checkbox" id="sound-enabled" class="w-5 h-5" checked>
                             Enable Sound Notifications
                         </label>
                     </div>
-                    <div class="setting-group">
-                        <label>
-                            <input type="checkbox" id="vibration-enabled" checked>
+                    <div class="mb-4 flex items-center gap-3">
+                        <label class="flex items-center gap-2 cursor-pointer font-medium text-gray-800">
+                            <input type="checkbox" id="vibration-enabled" class="w-5 h-5" checked>
                             Enable Vibration
                         </label>
                     </div>
-                    <div class="setting-group">
-                        <label>
-                            <input type="checkbox" id="auto-advance" checked>
+                    <div class="mb-4 flex items-center gap-3">
+                        <label class="flex items-center gap-2 cursor-pointer font-medium text-gray-800">
+                            <input type="checkbox" id="auto-advance" class="w-5 h-5" checked>
                             Auto-advance exercises
                         </label>
                     </div>
-                    <div class="setting-group">
-                        <label>Rest between sets:</label>
-                        <select id="rest-duration">
+                    <div class="mb-4 flex items-center gap-3">
+                        <label class="font-medium text-gray-800">Rest between sets:</label>
+                        <select id="rest-duration" class="px-3 py-2 border-2 border-gray-300 rounded-md bg-white text-sm">
                             <option value="30">30 seconds</option>
                             <option value="60" selected>1 minute</option>
                             <option value="90">1.5 minutes</option>
@@ -116,26 +154,26 @@
         </div>
 
         <!-- Exercise Modal -->
-        <div class="modal hidden" id="exercise-modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 id="modal-title">Exercise Name</h3>
-                    <button class="close-btn" id="close-modal">&times;</button>
+        <div class="fixed inset-0 bg-black/50 flex justify-center items-center z-[2000] hidden" id="exercise-modal">
+            <div class="bg-white rounded-3xl max-w-2xl w-11/12 max-h-[80vh] overflow-y-auto shadow-2xl">
+                <div class="flex justify-between items-center p-6 border-b border-gray-200 mb-5">
+                    <h3 class="text-bjj-blue text-xl font-semibold" id="modal-title">Exercise Name</h3>
+                    <button class="bg-none border-none text-3xl cursor-pointer text-gray-500 p-0 w-8 h-8 flex items-center justify-center hover:text-bjj-blue" id="close-modal">&times;</button>
                 </div>
-                <div class="modal-body">
-                    <div class="exercise-video">
-                        <div class="video-placeholder">
-                            <i class="fas fa-play-circle"></i>
+                <div class="px-6 pb-6">
+                    <div class="mb-5">
+                        <div class="bg-gray-100 rounded-xl p-10 text-center text-gray-600 border-2 border-dashed border-gray-300">
+                            <i class="fas fa-play-circle text-5xl text-bjj-blue mb-3"></i>
                             <p>Video demonstration</p>
                         </div>
                     </div>
-                    <div class="exercise-description" id="modal-description">
+                    <div class="mb-5 leading-relaxed text-gray-800" id="modal-description">
                         Exercise description will appear here.
                     </div>
                     <div class="exercise-cues">
-                        <h4>Key Cues:</h4>
-                        <ul id="modal-cues">
-                            <li>Loading...</li>
+                        <h4 class="text-bjj-blue mb-3 font-semibold">Key Cues:</h4>
+                        <ul class="list-none p-0" id="modal-cues">
+                            <li class="py-2 border-b border-gray-200 text-gray-600">Loading...</li>
                         </ul>
                     </div>
                 </div>
