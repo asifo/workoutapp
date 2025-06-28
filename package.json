@@ -1,0 +1,28 @@
+{
+  "name": "bjj-workout-app",
+  "version": "1.0.0",
+  "description": "Modern BJJ Kettlebell Conditioning App",
+  "main": "index.html",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "serve": "python -m http.server 8000"
+  },
+  "keywords": ["bjj", "workout", "kettlebell", "fitness"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "vite": "^5.0.0",
+    "@vitejs/plugin-legacy": "^5.0.0",
+    "postcss": "^8.4.0",
+    "autoprefixer": "^10.4.0",
+    "@tailwindcss/forms": "^0.5.0",
+    "@tailwindcss/aspect-ratio": "^0.4.0",
+    "vite-plugin-pwa": "^0.17.0",
+    "workbox-window": "^7.0.0"
+  },
+  "dependencies": {
+    "lucide": "^0.294.0"
+  }
+} 
