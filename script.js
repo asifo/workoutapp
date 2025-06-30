@@ -468,236 +468,289 @@ class BJJWorkoutApp {
     getWorkoutData() {
         return {
             1: {
-                name: "Kettlebell Snatch Intervals",
-                focus: "Power and Explosiveness",
+                name: "VO₂max Booster – Kettlebell Snatch Intervals",
+                focus: "Maximal aerobic power and explosive hip extension",
                 duration: 30,
                 phases: [
                     {
                         name: "Warm-Up",
                         duration: 5,
                         exercises: [
-                            { name: "Dynamic Warm-Up", duration: 180, description: "Joint mobility and movement prep" },
-                            { name: "Light Kettlebell Swings", duration: 120, description: "15-20 light swings" }
+                            { name: "Joint Mobilization", duration: 60, description: "Neck, shoulder, hip circles - 5-10 reps each" },
+                            { name: "Dynamic Movements", duration: 60, description: "Arm/leg swings, inchworms - 5 reps" },
+                            { name: "Light Aerobic Prep", duration: 30, description: "Jumping jacks" },
+                            { name: "KB Warm-up", duration: 150, description: "10 halos, 10 hip hinges, 10 light swings" }
                         ]
                     },
                     {
-                        name: "Snatch Practice",
-                        duration: 5,
+                        name: "15:15 Snatch Intervals",
+                        duration: 10,
                         exercises: [
-                            { name: "Snatch Technique", duration: 300, description: "Practice form with light weight" }
+                            { name: "Right Arm Snatches", duration: 15, description: "15s work - 6-8 snatches" },
+                            { name: "Rest", duration: 15, description: "15s rest" },
+                            { name: "Left Arm Snatches", duration: 15, description: "15s work - 6-8 snatches" },
+                            { name: "Rest", duration: 15, description: "15s rest" },
+                            { name: "Right Arm Snatches", duration: 15, description: "15s work - 6-8 snatches" },
+                            { name: "Rest", duration: 15, description: "15s rest" },
+                            { name: "Left Arm Snatches", duration: 15, description: "15s work - 6-8 snatches" },
+                            { name: "Rest", duration: 15, description: "15s rest" },
+                            { name: "Right Arm Snatches", duration: 15, description: "15s work - 6-8 snatches" },
+                            { name: "Rest", duration: 15, description: "15s rest" },
+                            { name: "Left Arm Snatches", duration: 15, description: "15s work - 6-8 snatches" },
+                            { name: "Rest", duration: 15, description: "15s rest" },
+                            { name: "Right Arm Snatches", duration: 15, description: "15s work - 6-8 snatches" },
+                            { name: "Rest", duration: 15, description: "15s rest" },
+                            { name: "Left Arm Snatches", duration: 15, description: "15s work - 6-8 snatches" },
+                            { name: "Rest", duration: 15, description: "15s rest" },
+                            { name: "Right Arm Snatches", duration: 15, description: "15s work - 6-8 snatches" },
+                            { name: "Rest", duration: 15, description: "15s rest" },
+                            { name: "Left Arm Snatches", duration: 15, description: "15s work - 6-8 snatches" },
+                            { name: "Rest", duration: 15, description: "15s rest" },
+                            { name: "Right Arm Snatches", duration: 15, description: "15s work - 6-8 snatches" },
+                            { name: "Rest", duration: 15, description: "15s rest" },
+                            { name: "Left Arm Snatches", duration: 15, description: "15s work - 6-8 snatches" },
+                            { name: "Rest", duration: 15, description: "15s rest" },
+                            { name: "Right Arm Snatches", duration: 15, description: "15s work - 6-8 snatches" },
+                            { name: "Rest", duration: 15, description: "15s rest" },
+                            { name: "Left Arm Snatches", duration: 15, description: "15s work - 6-8 snatches" },
+                            { name: "Rest", duration: 15, description: "15s rest" },
+                            { name: "Right Arm Snatches", duration: 15, description: "15s work - 6-8 snatches" },
+                            { name: "Rest", duration: 15, description: "15s rest" },
+                            { name: "Left Arm Snatches", duration: 15, description: "15s work - 6-8 snatches" },
+                            { name: "Rest", duration: 15, description: "15s rest" },
+                            { name: "Right Arm Snatches", duration: 15, description: "15s work - 6-8 snatches" },
+                            { name: "Rest", duration: 15, description: "15s rest" },
+                            { name: "Left Arm Snatches", duration: 15, description: "15s work - 6-8 snatches" },
+                            { name: "Rest", duration: 15, description: "15s rest" },
+                            { name: "Right Arm Snatches", duration: 15, description: "15s work - 6-8 snatches" },
+                            { name: "Rest", duration: 15, description: "15s rest" },
+                            { name: "Left Arm Snatches", duration: 15, description: "15s work - 6-8 snatches" },
+                            { name: "Rest", duration: 15, description: "15s rest" }
                         ]
                     },
                     {
-                        name: "Interval Training",
-                        duration: 15,
+                        name: "Optional Tabata Finisher",
+                        duration: 4,
                         exercises: [
-                            { name: "Right Arm Snatches", duration: 30, description: "30 seconds max reps" },
-                            { name: "Rest", duration: 30, description: "30 seconds recovery" },
-                            { name: "Left Arm Snatches", duration: 30, description: "30 seconds max reps" },
-                            { name: "Rest", duration: 30, description: "30 seconds recovery" },
-                            { name: "Right Arm Snatches", duration: 30, description: "30 seconds max reps" },
-                            { name: "Rest", duration: 30, description: "30 seconds recovery" },
-                            { name: "Left Arm Snatches", duration: 30, description: "30 seconds max reps" },
-                            { name: "Rest", duration: 30, description: "30 seconds recovery" },
-                            { name: "Right Arm Snatches", duration: 30, description: "30 seconds max reps" },
-                            { name: "Rest", duration: 30, description: "30 seconds recovery" },
-                            { name: "Left Arm Snatches", duration: 30, description: "30 seconds max reps" },
-                            { name: "Rest", duration: 30, description: "30 seconds recovery" },
-                            { name: "Right Arm Snatches", duration: 30, description: "30 seconds max reps" },
-                            { name: "Rest", duration: 30, description: "30 seconds recovery" },
-                            { name: "Left Arm Snatches", duration: 30, description: "30 seconds max reps" },
-                            { name: "Rest", duration: 30, description: "30 seconds recovery" }
+                            { name: "2-Hand Swings", duration: 20, description: "20s all-out effort" },
+                            { name: "Rest", duration: 10, description: "10s rest" },
+                            { name: "2-Hand Swings", duration: 20, description: "20s all-out effort" },
+                            { name: "Rest", duration: 10, description: "10s rest" },
+                            { name: "2-Hand Swings", duration: 20, description: "20s all-out effort" },
+                            { name: "Rest", duration: 10, description: "10s rest" },
+                            { name: "2-Hand Swings", duration: 20, description: "20s all-out effort" },
+                            { name: "Rest", duration: 10, description: "10s rest" },
+                            { name: "2-Hand Swings", duration: 20, description: "20s all-out effort" },
+                            { name: "Rest", duration: 10, description: "10s rest" },
+                            { name: "2-Hand Swings", duration: 20, description: "20s all-out effort" },
+                            { name: "Rest", duration: 10, description: "10s rest" },
+                            { name: "2-Hand Swings", duration: 20, description: "20s all-out effort" },
+                            { name: "Rest", duration: 10, description: "10s rest" },
+                            { name: "2-Hand Swings", duration: 20, description: "20s all-out effort" },
+                            { name: "Rest", duration: 10, description: "10s rest" }
                         ]
                     },
                     {
                         name: "Cooldown",
                         duration: 5,
                         exercises: [
-                            { name: "Light Movement", duration: 180, description: "Easy walking and stretching" },
-                            { name: "Breathing Exercise", duration: 120, description: "Deep breathing for recovery" }
+                            { name: "Forearm Stretches", duration: 60, description: "Extend arm, pull back fingers" },
+                            { name: "Hamstring & Hip Flexor Stretches", duration: 120, description: "Lunging hip stretches" },
+                            { name: "Breathing Drills", duration: 120, description: "Deep diaphragmatic breathing" }
                         ]
                     }
                 ]
             },
             2: {
-                name: "EMOM Kettlebell Circuit",
-                focus: "Strength-Endurance",
+                name: "EMOM Strength-Endurance Circuit",
+                focus: "Lactate threshold and muscular endurance",
                 duration: 30,
                 phases: [
                     {
                         name: "Warm-Up",
                         duration: 5,
                         exercises: [
-                            { name: "Dynamic Warm-Up", duration: 180, description: "Joint mobility and movement prep" },
-                            { name: "Movement Practice", duration: 120, description: "Practice all movements" }
+                            { name: "Dynamic Warm-Up", duration: 180, description: "Standard dynamic warm-up + 10 lunges + 5 push-ups" },
+                            { name: "Practice Swings", duration: 120, description: "5 practice swings focusing on form" }
                         ]
                     },
                     {
-                        name: "EMOM Circuit",
-                        duration: 20,
+                        name: "12-Minute EMOM Circuit",
+                        duration: 12,
                         exercises: [
-                            { name: "Minute 1: Swings", duration: 60, description: "20 swings, rest remainder" },
-                            { name: "Minute 2: Goblet Squats", duration: 60, description: "15 squats, rest remainder" },
-                            { name: "Minute 3: Single-Arm Rows", duration: 60, description: "10 each arm, rest remainder" },
-                            { name: "Minute 4: Push-Ups", duration: 60, description: "10-15 reps, rest remainder" },
-                            { name: "Minute 5: Swings", duration: 60, description: "20 swings, rest remainder" },
-                            { name: "Minute 6: Goblet Squats", duration: 60, description: "15 squats, rest remainder" },
-                            { name: "Minute 7: Single-Arm Rows", duration: 60, description: "10 each arm, rest remainder" },
-                            { name: "Minute 8: Push-Ups", duration: 60, description: "10-15 reps, rest remainder" },
-                            { name: "Minute 9: Swings", duration: 60, description: "20 swings, rest remainder" },
-                            { name: "Minute 10: Goblet Squats", duration: 60, description: "15 squats, rest remainder" },
-                            { name: "Minute 11: Single-Arm Rows", duration: 60, description: "10 each arm, rest remainder" },
-                            { name: "Minute 12: Push-Ups", duration: 60, description: "10-15 reps, rest remainder" },
-                            { name: "Minute 13: Swings", duration: 60, description: "20 swings, rest remainder" },
-                            { name: "Minute 14: Goblet Squats", duration: 60, description: "15 squats, rest remainder" },
-                            { name: "Minute 15: Single-Arm Rows", duration: 60, description: "10 each arm, rest remainder" },
-                            { name: "Minute 16: Push-Ups", duration: 60, description: "10-15 reps, rest remainder" },
-                            { name: "Minute 17: Swings", duration: 60, description: "20 swings, rest remainder" },
-                            { name: "Minute 18: Goblet Squats", duration: 60, description: "15 squats, rest remainder" },
-                            { name: "Minute 19: Single-Arm Rows", duration: 60, description: "10 each arm, rest remainder" },
-                            { name: "Minute 20: Push-Ups", duration: 60, description: "10-15 reps, rest remainder" }
+                            { name: "Minute 1: Swings + Push-Ups", duration: 60, description: "15 2-hand KB swings + 5 push-ups" },
+                            { name: "Minute 2: Goblet Squats", duration: 60, description: "10 goblet squats" },
+                            { name: "Minute 3: Swings + Push-Ups", duration: 60, description: "15 2-hand KB swings + 5 push-ups" },
+                            { name: "Minute 4: Goblet Squats", duration: 60, description: "10 goblet squats" },
+                            { name: "Minute 5: Swings + Push-Ups", duration: 60, description: "15 2-hand KB swings + 5 push-ups" },
+                            { name: "Minute 6: Goblet Squats", duration: 60, description: "10 goblet squats" },
+                            { name: "Minute 7: Swings + Push-Ups", duration: 60, description: "15 2-hand KB swings + 5 push-ups" },
+                            { name: "Minute 8: Goblet Squats", duration: 60, description: "10 goblet squats" },
+                            { name: "Minute 9: Swings + Push-Ups", duration: 60, description: "15 2-hand KB swings + 5 push-ups" },
+                            { name: "Minute 10: Goblet Squats", duration: 60, description: "10 goblet squats" },
+                            { name: "Minute 11: Swings + Push-Ups", duration: 60, description: "15 2-hand KB swings + 5 push-ups" },
+                            { name: "Minute 12: Goblet Squats", duration: 60, description: "10 goblet squats" }
+                        ]
+                    },
+                    {
+                        name: "Optional Farmer's Carry",
+                        duration: 8,
+                        exercises: [
+                            { name: "Right Hand Carry", duration: 30, description: "30 seconds farmer's carry" },
+                            { name: "Rest", duration: 30, description: "30-60 seconds rest" },
+                            { name: "Left Hand Carry", duration: 30, description: "30 seconds farmer's carry" },
+                            { name: "Rest", duration: 30, description: "30-60 seconds rest" },
+                            { name: "Right Hand Carry", duration: 30, description: "30 seconds farmer's carry" },
+                            { name: "Rest", duration: 30, description: "30-60 seconds rest" },
+                            { name: "Left Hand Carry", duration: 30, description: "30 seconds farmer's carry" },
+                            { name: "Rest", duration: 30, description: "30-60 seconds rest" },
+                            { name: "Right Hand Carry", duration: 30, description: "30 seconds farmer's carry" },
+                            { name: "Rest", duration: 30, description: "30-60 seconds rest" },
+                            { name: "Left Hand Carry", duration: 30, description: "30 seconds farmer's carry" },
+                            { name: "Rest", duration: 30, description: "30-60 seconds rest" }
                         ]
                     },
                     {
                         name: "Cooldown",
                         duration: 5,
                         exercises: [
-                            { name: "Active Stretching", duration: 300, description: "Full body stretching routine" }
+                            { name: "Chest & Quad Stretches", duration: 120, description: "Quad stretch and doorway chest stretch" },
+                            { name: "Forearm Stretches", duration: 60, description: "Gently stretch forearms and shake out hands" },
+                            { name: "Cat-Cow Stretches", duration: 120, description: "Gentle cat-cow stretches for back recovery" }
                         ]
                     }
                 ]
             },
             3: {
-                name: "Aerobic Base and Core Strength",
-                focus: "Endurance and Core",
+                name: "Low-Intensity Aerobic + Core Day",
+                focus: "Aerobic base and core stability while promoting recovery",
                 duration: 30,
                 phases: [
                     {
                         name: "Warm-Up",
                         duration: 5,
                         exercises: [
-                            { name: "Mobility Work", duration: 180, description: "Slow arm/leg swings, torso twists" },
-                            { name: "Turkish Get-Up Practice", duration: 120, description: "Light TGU rehearsal" }
+                            { name: "Mobility Work", duration: 180, description: "Slow arm/leg swings, gentle torso twists" },
+                            { name: "Turkish Get-Up Practice", duration: 120, description: "1-2 Turkish Get-Ups without weight" }
                         ]
                     },
                     {
                         name: "20-Minute Continuous Flow",
                         duration: 20,
                         exercises: [
-                            { name: "Turkish Get-Up", duration: 120, description: "1 rep each side" },
-                            { name: "Kettlebell Halos", duration: 30, description: "5 rotations each direction" },
-                            { name: "Goblet Reverse Lunges", duration: 60, description: "5 each leg" },
-                            { name: "Plank Pull-Through", duration: 60, description: "5 each side" },
-                            { name: "Light Jogging", duration: 30, description: "30 seconds easy movement" },
-                            { name: "Turkish Get-Up", duration: 120, description: "1 rep each side" },
-                            { name: "Kettlebell Halos", duration: 30, description: "5 rotations each direction" },
-                            { name: "Goblet Reverse Lunges", duration: 60, description: "5 each leg" },
-                            { name: "Plank Pull-Through", duration: 60, description: "5 each side" },
-                            { name: "Light Jogging", duration: 30, description: "30 seconds easy movement" },
-                            { name: "Turkish Get-Up", duration: 120, description: "1 rep each side" },
-                            { name: "Kettlebell Halos", duration: 30, description: "5 rotations each direction" },
-                            { name: "Goblet Reverse Lunges", duration: 60, description: "5 each leg" },
-                            { name: "Plank Pull-Through", duration: 60, description: "5 each side" },
-                            { name: "Light Jogging", duration: 30, description: "30 seconds easy movement" },
-                            { name: "Turkish Get-Up", duration: 120, description: "1 rep each side" },
-                            { name: "Kettlebell Halos", duration: 30, description: "5 rotations each direction" },
-                            { name: "Goblet Reverse Lunges", duration: 60, description: "5 each leg" },
-                            { name: "Plank Pull-Through", duration: 60, description: "5 each side" },
-                            { name: "Light Jogging", duration: 30, description: "30 seconds easy movement" }
+                            { name: "Turkish Get-Up", duration: 120, description: "1 rep per side" },
+                            { name: "Kettlebell Halos", duration: 30, description: "5 per direction" },
+                            { name: "Goblet Reverse Lunges", duration: 60, description: "5 per leg" },
+                            { name: "Plank with KB Pull-Through", duration: 60, description: "5 per side" },
+                            { name: "Jog in Place or Skipping", duration: 30, description: "30 seconds easy movement" },
+                            { name: "Turkish Get-Up", duration: 120, description: "1 rep per side" },
+                            { name: "Kettlebell Halos", duration: 30, description: "5 per direction" },
+                            { name: "Goblet Reverse Lunges", duration: 60, description: "5 per leg" },
+                            { name: "Plank with KB Pull-Through", duration: 60, description: "5 per side" },
+                            { name: "Jog in Place or Skipping", duration: 30, description: "30 seconds easy movement" },
+                            { name: "Turkish Get-Up", duration: 120, description: "1 rep per side" },
+                            { name: "Kettlebell Halos", duration: 30, description: "5 per direction" },
+                            { name: "Goblet Reverse Lunges", duration: 60, description: "5 per leg" },
+                            { name: "Plank with KB Pull-Through", duration: 60, description: "5 per side" },
+                            { name: "Jog in Place or Skipping", duration: 30, description: "30 seconds easy movement" },
+                            { name: "Turkish Get-Up", duration: 120, description: "1 rep per side" },
+                            { name: "Kettlebell Halos", duration: 30, description: "5 per direction" },
+                            { name: "Goblet Reverse Lunges", duration: 60, description: "5 per leg" },
+                            { name: "Plank with KB Pull-Through", duration: 60, description: "5 per side" },
+                            { name: "Jog in Place or Skipping", duration: 30, description: "30 seconds easy movement" }
                         ]
                     },
                     {
                         name: "Cooldown",
                         duration: 5,
                         exercises: [
-                            { name: "Static Stretching", duration: 300, description: "Cobra, figure-4, neck stretches" }
+                            { name: "Cobra & Figure-4 Stretches", duration: 120, description: "Cobra, figure-4 stretches for glutes" },
+                            { name: "Neck & Back Stretches", duration: 120, description: "Gentle neck stretches, breathing drills" },
+                            { name: "Deep Breathing", duration: 60, description: "Inhale through nose, slow exhale through mouth" }
                         ]
                     }
                 ]
             },
             4: {
-                name: "Kettlebell Complex for Power-Endurance",
-                focus: "Full-Body Conditioning",
+                name: "Kettlebell Complex – Power-Endurance",
+                focus: "Power-endurance and grip strength under prolonged effort",
                 duration: 30,
                 phases: [
                     {
                         name: "Warm-Up",
                         duration: 5,
                         exercises: [
-                            { name: "Dynamic Warm-Up", duration: 180, description: "Joint mobility and movement prep" },
-                            { name: "Complex Practice", duration: 120, description: "Light practice of complex movements" }
+                            { name: "Dynamic Warm-Up", duration: 180, description: "Standard warm-up" },
+                            { name: "Complex Practice", duration: 120, description: "Practice reps of complex movements: swings, cleans, presses, squats" }
                         ]
                     },
                     {
-                        name: "Kettlebell Complex",
-                        duration: 15,
+                        name: "KB Complex",
+                        duration: 18,
                         exercises: [
-                            { name: "Right Arm Complex", duration: 45, description: "5 swings, 5 cleans, 5 presses, 5 squats" },
-                            { name: "Left Arm Complex", duration: 45, description: "5 swings, 5 cleans, 5 presses, 5 squats" },
-                            { name: "Rest", duration: 90, description: "Recovery between rounds" },
-                            { name: "Right Arm Complex", duration: 45, description: "5 swings, 5 cleans, 5 presses, 5 squats" },
-                            { name: "Left Arm Complex", duration: 45, description: "5 swings, 5 cleans, 5 presses, 5 squats" },
-                            { name: "Rest", duration: 90, description: "Recovery between rounds" },
-                            { name: "Right Arm Complex", duration: 45, description: "5 swings, 5 cleans, 5 presses, 5 squats" },
-                            { name: "Left Arm Complex", duration: 45, description: "5 swings, 5 cleans, 5 presses, 5 squats" },
-                            { name: "Rest", duration: 90, description: "Recovery between rounds" },
-                            { name: "Right Arm Complex", duration: 45, description: "5 swings, 5 cleans, 5 presses, 5 squats" },
-                            { name: "Left Arm Complex", duration: 45, description: "5 swings, 5 cleans, 5 presses, 5 squats" },
-                            { name: "Rest", duration: 90, description: "Recovery between rounds" },
-                            { name: "Right Arm Complex", duration: 45, description: "5 swings, 5 cleans, 5 presses, 5 squats" },
-                            { name: "Left Arm Complex", duration: 45, description: "5 swings, 5 cleans, 5 presses, 5 squats" }
+                            { name: "Right Arm Complex", duration: 90, description: "5 one-arm swings, 5 cleans, 5 overhead presses, 5 front squats" },
+                            { name: "Left Arm Complex", duration: 90, description: "5 one-arm swings, 5 cleans, 5 overhead presses, 5 front squats" },
+                            { name: "Rest", duration: 120, description: "1-2 minutes rest" },
+                            { name: "Right Arm Complex", duration: 90, description: "5 one-arm swings, 5 cleans, 5 overhead presses, 5 front squats" },
+                            { name: "Left Arm Complex", duration: 90, description: "5 one-arm swings, 5 cleans, 5 overhead presses, 5 front squats" },
+                            { name: "Rest", duration: 120, description: "1-2 minutes rest" },
+                            { name: "Right Arm Complex", duration: 90, description: "5 one-arm swings, 5 cleans, 5 overhead presses, 5 front squats" },
+                            { name: "Left Arm Complex", duration: 90, description: "5 one-arm swings, 5 cleans, 5 overhead presses, 5 front squats" }
                         ]
                     },
                     {
                         name: "Optional Finisher",
                         duration: 2,
                         exercises: [
-                            { name: "30-20-10 Ladder", duration: 120, description: "High-pulls and burpees" }
+                            { name: "30-20-10 Ladder", duration: 120, description: "Sumo Deadlift High-Pulls + Burpees (30s, 20s, 10s work)" }
                         ]
                     },
                     {
                         name: "Cooldown",
                         duration: 5,
                         exercises: [
-                            { name: "Active Stretching", duration: 300, description: "Shoulders, forearms, legs" }
+                            { name: "Arm Flossing & Forearm Stretches", duration: 120, description: "Shoulder stretches, forearm stretches" },
+                            { name: "Cossack Squats & Spinal Twists", duration: 180, description: "Deep cossack squats, reclined twist stretches" }
                         ]
                     }
                 ]
             },
             5: {
-                name: "High-Intensity Grappling Circuit",
-                focus: "AMRAP Rounds for Fight Conditioning",
+                name: "AMRAP Grappling Circuit",
+                focus: "High-intensity interval training tailored to mimic BJJ sparring rounds",
                 duration: 30,
                 phases: [
                     {
                         name: "Warm-Up",
                         duration: 5,
                         exercises: [
-                            { name: "Dynamic Warm-Up", duration: 180, description: "Joint mobility and movement prep" },
-                            { name: "Burst Drills", duration: 120, description: "Short high-intensity bursts" }
+                            { name: "Dynamic Warm-Up", duration: 180, description: "Standard dynamic warm-up" },
+                            { name: "Burst Drills", duration: 120, description: "2 sets of 5 KB swings + 2 burpees, done briskly" }
                         ]
                     },
                     {
-                        name: "Sparring Rounds Circuit",
+                        name: "3x3 Minute AMRAP",
                         duration: 12,
                         exercises: [
-                            { name: "AMRAP Round 1", duration: 180, description: "3 minutes: 5 rows per side, 5 thrusters, 5 burpees, 10 swings" },
-                            { name: "Rest", duration: 60, description: "1 minute recovery" },
-                            { name: "AMRAP Round 2", duration: 180, description: "3 minutes: 5 rows per side, 5 thrusters, 5 burpees, 10 swings" },
-                            { name: "Rest", duration: 60, description: "1 minute recovery" },
-                            { name: "AMRAP Round 3", duration: 180, description: "3 minutes: 5 rows per side, 5 thrusters, 5 burpees, 10 swings" },
-                            { name: "Rest", duration: 60, description: "1 minute recovery" }
+                            { name: "AMRAP Round 1", duration: 180, description: "5 one-arm KB rows per side, 5 KB thrusters, 5 burpees or sprawls, 10 2-hand KB swings" },
+                            { name: "Rest", duration: 60, description: "1 minute rest - walk around, shake out limbs" },
+                            { name: "AMRAP Round 2", duration: 180, description: "5 one-arm KB rows per side, 5 KB thrusters, 5 burpees or sprawls, 10 2-hand KB swings" },
+                            { name: "Rest", duration: 60, description: "1 minute rest - walk around, shake out limbs" },
+                            { name: "AMRAP Round 3", duration: 180, description: "5 one-arm KB rows per side, 5 KB thrusters, 5 burpees or sprawls, 10 2-hand KB swings" },
+                            { name: "Rest", duration: 60, description: "1 minute rest - walk around, shake out limbs" }
                         ]
                     },
                     {
-                        name: "Grip Burnout",
-                        duration: 3,
+                        name: "Finisher",
+                        duration: 8,
                         exercises: [
-                            { name: "Towel Hang", duration: 30, description: "30 seconds per set" },
+                            { name: "Towel or KB Hang", duration: 30, description: "20-30 seconds per set (towel grip simulation)" },
                             { name: "Rest", duration: 30, description: "30 seconds rest" },
-                            { name: "Towel Hang", duration: 30, description: "30 seconds per set" },
+                            { name: "Towel or KB Hang", duration: 30, description: "20-30 seconds per set (towel grip simulation)" },
                             { name: "Rest", duration: 30, description: "30 seconds rest" },
-                            { name: "Towel Hang", duration: 30, description: "30 seconds per set" },
+                            { name: "Towel or KB Hang", duration: 30, description: "20-30 seconds per set (towel grip simulation)" },
+                            { name: "Rest", duration: 30, description: "30 seconds rest" },
+                            { name: "Towel or KB Hang", duration: 30, description: "20-30 seconds per set (towel grip simulation)" },
                             { name: "Rest", duration: 30, description: "30 seconds rest" }
                         ]
                     },
@@ -705,7 +758,8 @@ class BJJWorkoutApp {
                         name: "Cooldown",
                         duration: 5,
                         exercises: [
-                            { name: "Active Recovery", duration: 300, description: "Walking, stretching, rehydration" }
+                            { name: "Walk & Stretch", duration: 180, description: "Walk, forearm and neck stretches" },
+                            { name: "Figure-4 & Child's Pose", duration: 120, description: "Figure-4 and child's pose stretches" }
                         ]
                     }
                 ]
