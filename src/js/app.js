@@ -466,7 +466,296 @@ class ModernBJJWorkoutApp extends EventEmitter {
         });
     }
 
-    // Enhanced timer functionality with smooth animations
+    displayWorkoutDetails() {
+        if (!this.state.currentWorkout || !this.elements.workoutDetails) {
+            return;
+        }
+
+        const workout = this.state.currentWorkout;
+        const detailsHTML = `
+            <div class="workout-header">
+                <h3 class="workout-title">${workout.name}</h3>
+                <p class="workout-focus">${workout.focus}</p>
+                <p class="workout-duration">${workout.duration} minutes</p>
+            </div>
+            <div class="workout-phases">
+                ${workout.phases.map((phase, index) => `
+                    <div class="phase-card ${phase.optional ? 'phase-card--optional' : ''}">
+                        <h4 class="phase-title">${phase.name}</h4>
+                        <p class="phase-duration">${phase.duration} minutes</p>
+                        ${phase.repeat ? `<p class="phase-repeat">Repeat ${phase.repeat} times</p>` : ''}
+                        <div class="phase-exercises">
+                            ${phase.exercises.slice(0, 3).map(exercise => `
+                                <span class="exercise-tag">${exercise.name}</span>
+                            `).join('')}
+                            ${phase.exercises.length > 3 ? `<span class="exercise-more">+${phase.exercises.length - 3} more</span>` : ''}
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+
+        this.elements.workoutDetails.innerHTML = detailsHTML;
+        
+        // Animate in the details
+        animationManager.slideIn(this.elements.workoutDetails, 'up', 300);
+    }
+
+    populateExerciseLibrary() {
+        if (!this.elements.exerciseGrid) {
+            return;
+        }
+
+        const exerciseLibrary = this.getExerciseLibrary();
+        const exerciseHTML = Object.entries(exerciseLibrary).map(([name, exercise]) => `
+            <div class="exercise-card" data-exercise="${name}">
+                <div class="exercise-header">
+                    <h4 class="exercise-name">${name}</h4>
+                    <span class="exercise-type exercise-type--${exercise.type.toLowerCase()}">${exercise.type}</span>
+                </div>
+                <p class="exercise-description">${exercise.description}</p>
+                <button class="btn btn--secondary btn--sm" onclick="bjjApp.showExerciseModal('${name}')">
+                    View Details
+                </button>
+            </div>
+        `).join('');
+
+        this.elements.exerciseGrid.innerHTML = exerciseHTML;
+        
+        // Add stagger animation
+        const exerciseCards = this.elements.exerciseGrid.querySelectorAll('.exercise-card');
+        animationManager.staggerAnimation(exerciseCards, 'animate-in', 100);
+    }
+
+    // Enhanced workout progression methods
+    startNextPhase() {
+        console.log('startNextPhase called, currentPhase:', this.state.currentPhase);
+        if (!this.state.isRunning || !this.state.currentWorkout) return;
+
+        const phases = this.state.currentWorkout.phases;
+        console.log('Total phases:', phases.length);
+        
+        if (this.state.currentPhase >= phases.length) {
+            console.log('All phases complete');
+            this.completeWorkout();
+            return;
+        }
+
+        const phase = phases[this.state.currentPhase];
+        console.log('Starting phase:', phase.name, 'Phase duration:', phase.duration, 'minutes');
+        
+        // Initialize phase timing
+        this.setState({
+            phaseStartTime: Date.now(),
+            phaseElapsedTime: 0,
+            currentExercise: 0
+        });
+        
+        console.log('Phase timing initialized - start time:', this.state.phaseStartTime);
+        
+        this.elements.timerLabel.textContent = phase.name;
+        this.elements.phaseInfo.textContent = `Phase ${this.state.currentPhase + 1} of ${phases.length}`;
+        
+        // Announce the phase (not priority, so exercise will follow)
+        console.log('Announcing phase:', phase.name);
+        this.speak(`Starting ${phase.name}`, false);
+        
+        this.startNextExercise();
+    }
+
+    startNextExercise() {
+        console.log('startNextExercise called, currentExercise:', this.state.currentExercise);
+        
+        try {
+            if (!this.state.isRunning || !this.state.currentWorkout) {
+                console.log('Cannot start next exercise - not running or no workout');
+                return;
+            }
+
+            const phases = this.state.currentWorkout.phases;
+            
+            // Validate current phase
+            if (this.state.currentPhase >= phases.length) {
+                console.log('Current phase out of bounds, completing workout');
+                this.completeWorkout();
+                return;
+            }
+            
+            const phase = phases[this.state.currentPhase];
+            console.log('Current phase:', phase.name, 'Phase exercises:', phase.exercises.length);
+            console.log('Current exercise index:', this.state.currentExercise);
+            
+            // Calculate phase elapsed time
+            const phaseElapsedTime = (Date.now() - this.state.phaseStartTime) / 1000;
+            this.setState({ phaseElapsedTime });
+            
+            // Validate current exercise index
+            if (this.state.currentExercise >= phase.exercises.length) {
+                console.log('Current exercise index out of bounds, resetting to 0');
+                this.setState({ currentExercise: 0 });
+            }
+
+            const exercise = phase.exercises[this.state.currentExercise];
+            console.log('Starting exercise:', exercise.name, 'Duration:', exercise.duration);
+            
+            // Calculate which round we're in (for display purposes)
+            const roundDuration = phase.exercises.reduce((sum, ex) => sum + ex.duration, 0);
+            const completedRounds = Math.floor(this.state.phaseElapsedTime / roundDuration);
+            const currentRound = completedRounds + 1;
+            
+            this.elements.timerLabel.textContent = exercise.name;
+            this.elements.phaseInfo.textContent = `${phase.name} - Round ${currentRound} (${Math.floor(this.state.phaseElapsedTime / 60)}:${Math.floor(this.state.phaseElapsedTime % 60).toString().padStart(2, '0')})`;
+            
+            // Set the exercise duration
+            this.setState({ timeRemaining: exercise.duration });
+            this.updateDisplay();
+            
+            // Announce the exercise and start timer immediately
+            console.log('About to announce exercise:', exercise.name);
+            console.log('Voice enabled:', this.state.settings.voiceEnabled);
+            
+            // Add a small delay to ensure speech synthesis is ready
+            setTimeout(() => {
+                this.speak(`${exercise.name}. ${exercise.description}`, true);
+                this.startTimer();
+            }, 500);
+            
+            // Update navigation buttons
+            this.updateNavigationButtons();
+            
+        } catch (error) {
+            console.error('Error in startNextExercise:', error);
+            // Try to recover
+            this.setState({ isRunning: false });
+            if (this.timer) {
+                clearInterval(this.timer);
+                this.timer = null;
+            }
+        }
+    }
+
+    nextExercise() {
+        console.log('nextExercise called');
+        
+        try {
+            if (!this.state.isRunning) {
+                console.log('Workout is not running, not proceeding');
+                return;
+            }
+            
+            if (!this.state.currentWorkout) {
+                console.log('No current workout, not proceeding');
+                return;
+            }
+            
+            // Stop current timer safely
+            if (this.timer) {
+                clearInterval(this.timer);
+                this.timer = null;
+                console.log('Timer stopped in nextExercise');
+            }
+
+            // Simple increment to next exercise
+            this.setState({ currentExercise: this.state.currentExercise + 1 });
+            console.log('Incremented to exercise:', this.state.currentExercise);
+            
+            const phases = this.state.currentWorkout.phases;
+            
+            // Validate current phase
+            if (this.state.currentPhase >= phases.length) {
+                console.log('Current phase out of bounds, completing workout');
+                this.completeWorkout();
+                return;
+            }
+            
+            const phase = phases[this.state.currentPhase];
+            console.log('Current phase:', phase.name, 'Total exercises in phase:', phase.exercises.length);
+            
+            // Check if we've completed all exercises in current phase
+            if (this.state.currentExercise >= phase.exercises.length) {
+                console.log('Completed all exercises in phase, moving to next phase');
+                this.setState({ 
+                    currentPhase: this.state.currentPhase + 1,
+                    currentExercise: 0
+                });
+                
+                // Check if we've completed all phases
+                if (this.state.currentPhase >= phases.length) {
+                    console.log('All phases complete');
+                    this.completeWorkout();
+                    return;
+                }
+                
+                if (this.state.settings.autoAdvance) {
+                    this.startNextPhase();
+                } else {
+                    this.pauseWorkout();
+                }
+            } else {
+                console.log('Continuing with next exercise in same phase');
+                if (this.state.settings.autoAdvance) {
+                    this.startNextExercise();
+                } else {
+                    this.pauseWorkout();
+                }
+            }
+        } catch (error) {
+            console.error('Error in nextExercise:', error);
+            this.showError('Error during exercise transition');
+        }
+    }
+
+    completeWorkout() {
+        console.log('Workout completed!');
+        this.setState({
+            isRunning: false,
+            isPaused: false
+        });
+
+        if (this.timer) {
+            clearInterval(this.timer);
+            this.timer = null;
+        }
+
+        // Clear speech
+        this.clearSpeech();
+
+        // Update UI
+        this.updateStartButton('Start Workout');
+        this.elements.timerLabel.textContent = 'Workout Complete!';
+        this.elements.phaseInfo.textContent = 'Great job!';
+        
+        // Show completion message
+        this.showSuccess('Workout completed successfully!');
+        this.speak('Workout complete! Great job!', true);
+        
+        // Celebration animation
+        animationManager.celebrationAnimation(this.elements.timerDisplay);
+
+        this.emit('workout:complete');
+    }
+
+    updateNavigationButtons() {
+        // Implementation for navigation button updates
+        if (this.elements.backBtn) {
+            this.elements.backBtn.disabled = this.state.currentExercise === 0 && this.state.currentPhase === 0;
+        }
+        
+        if (this.elements.skipBtn) {
+            this.elements.skipBtn.disabled = !this.state.isRunning;
+        }
+    }
+
+    // Core workout methods (enhanced versions of existing methods)
+    toggleWorkout() {
+        if (this.state.isRunning) {
+            this.pauseWorkout();
+        } else {
+            this.startWorkout();
+        }
+    }
+
+    // Enhanced workout functionality with smooth animations
     startWorkout() {
         if (!this.state.currentWorkout) {
             this.showError('Please select a workout first');
@@ -485,6 +774,15 @@ class ModernBJJWorkoutApp extends EventEmitter {
                           this.state.timeRemaining > 0;
 
         if (!isResuming) {
+            // Initialize workout state
+            this.setState({
+                currentPhase: 0,
+                currentExercise: 0,
+                timeRemaining: 0,
+                phaseStartTime: Date.now(),
+                phaseElapsedTime: 0,
+                completedExercises: 0
+            });
             this.startNextPhase();
         } else {
             this.startTimer();
@@ -883,18 +1181,6 @@ class ModernBJJWorkoutApp extends EventEmitter {
         }
     }
 
-    // Core workout methods (enhanced versions of existing methods)
-    toggleWorkout() {
-        if (this.state.isRunning) {
-            this.pauseWorkout();
-        } else {
-            this.startWorkout();
-        }
-    }
-
-    // ... (Include enhanced versions of all other existing methods)
-    // For brevity, I'll include the key enhanced methods
-
     // Enhanced settings management
     loadSettings() {
         const savedSettings = Storage.get('bjj-workout-settings', {});
@@ -1037,26 +1323,611 @@ class ModernBJJWorkoutApp extends EventEmitter {
         this.emit('app:destroy');
     }
 
+    // Navigation methods for skipping exercises
+    skipExercise() {
+        console.log('=== SKIP EXERCISE ===');
+        console.log('Current phase:', this.state.currentPhase, 'Current exercise:', this.state.currentExercise);
+        
+        try {
+            if (!this.state.currentWorkout) {
+                console.log('No current workout selected');
+                return;
+            }
+            
+            if (!this.state.isRunning) {
+                console.log('Workout is not running');
+                return;
+            }
+            
+            // Stop current timer safely
+            if (this.timer) {
+                clearInterval(this.timer);
+                this.timer = null;
+                console.log('Timer stopped');
+            }
+            
+            // Clear any ongoing speech
+            this.clearSpeech();
+            
+            const phases = this.state.currentWorkout.phases;
+            
+            // Check if we've completed all phases
+            if (this.state.currentPhase >= phases.length) {
+                console.log('All phases complete');
+                this.completeWorkout();
+                return;
+            }
+            
+            const phase = phases[this.state.currentPhase];
+            
+            // Move to next exercise within the current phase
+            let nextExercise = this.state.currentExercise + 1;
+            
+            // If we've completed all exercises in this phase, move to next phase
+            if (nextExercise >= phase.exercises.length) {
+                console.log('Completed all exercises in phase, moving to next phase');
+                this.setState({ 
+                    currentPhase: this.state.currentPhase + 1,
+                    currentExercise: 0
+                });
+                
+                // Check if we've completed all phases
+                if (this.state.currentPhase >= phases.length) {
+                    console.log('All phases complete');
+                    this.completeWorkout();
+                    return;
+                }
+                
+                this.startNextPhase();
+                return;
+            }
+            
+            this.setState({ currentExercise: nextExercise });
+            
+            console.log('New position - Phase:', this.state.currentPhase, 'Exercise:', this.state.currentExercise);
+            this.startNextExercise();
+            
+            // Update navigation buttons after the change
+            this.updateNavigationButtons();
+            
+        } catch (error) {
+            console.error('Error in skipExercise:', error);
+            this.showError('Error skipping exercise');
+            // Try to recover by pausing
+            this.pauseWorkout();
+        }
+    }
+
+    goBack() {
+        console.log('=== GO BACK ===');
+        
+        try {
+            if (!this.state.currentWorkout) {
+                console.log('No current workout selected');
+                return;
+            }
+            
+            if (!this.state.isRunning) {
+                console.log('Workout is not running');
+                return;
+            }
+            
+            // Stop current timer safely
+            if (this.timer) {
+                clearInterval(this.timer);
+                this.timer = null;
+                console.log('Timer stopped in goBack');
+            }
+            
+            // Clear any ongoing speech
+            this.clearSpeech();
+            
+            // Move to previous exercise
+            let prevExercise = this.state.currentExercise - 1;
+            let prevPhase = this.state.currentPhase;
+            
+            // Check if we need to move to previous phase
+            if (prevExercise < 0) {
+                prevPhase--;
+                
+                // Check if we've gone before the first phase
+                if (prevPhase < 0) {
+                    console.log('At the beginning, cannot go back further');
+                    this.showToast('Already at the beginning', 'info');
+                    return;
+                } else {
+                    // Go to last exercise of previous phase
+                    const phase = this.state.currentWorkout.phases[prevPhase];
+                    prevExercise = phase.exercises.length - 1;
+                }
+            }
+            
+            this.setState({ 
+                currentPhase: prevPhase, 
+                currentExercise: prevExercise 
+            });
+            
+            console.log('New position - Phase:', this.state.currentPhase, 'Exercise:', this.state.currentExercise);
+            
+            // Start the previous exercise
+            this.startNextExercise();
+            
+            // Update navigation buttons after the change
+            this.updateNavigationButtons();
+            
+        } catch (error) {
+            console.error('Error in goBack:', error);
+            this.showError('Error going back');
+            this.pauseWorkout();
+        }
+    }
+
     // Include all existing workout data methods
     getWorkoutData() {
-        // Return the same workout data structure as the original
         return {
             1: {
                 name: "High-Intensity Kettlebell Snatch Intervals",
                 focus: "VO₂max Booster",
                 duration: 30,
                 phases: [
-                    // ... (same as original)
+                    {
+                        name: "Warm-Up",
+                        duration: 5,
+                        exercises: [
+                            { name: "Joint Mobilization", duration: 120, description: "Neck, shoulder, and hip circles" },
+                            { name: "Dynamic Movements", duration: 120, description: "Arm swings, leg swings, inchworms" },
+                            { name: "Kettlebell Prep", duration: 60, description: "Halos, light swings" }
+                        ]
+                    },
+                    {
+                        name: "15:15 Snatch Intervals",
+                        duration: 10,
+                        exercises: [
+                            // Round 1
+                            { name: "Right Arm Snatches", duration: 15, description: "15 seconds work" },
+                            { name: "Rest", duration: 15, description: "15 seconds rest" },
+                            { name: "Left Arm Snatches", duration: 15, description: "15 seconds work" },
+                            { name: "Rest", duration: 15, description: "15 seconds rest" },
+                            // Round 2
+                            { name: "Right Arm Snatches", duration: 15, description: "15 seconds work" },
+                            { name: "Rest", duration: 15, description: "15 seconds rest" },
+                            { name: "Left Arm Snatches", duration: 15, description: "15 seconds work" },
+                            { name: "Rest", duration: 15, description: "15 seconds rest" },
+                            // Round 3
+                            { name: "Right Arm Snatches", duration: 15, description: "15 seconds work" },
+                            { name: "Rest", duration: 15, description: "15 seconds rest" },
+                            { name: "Left Arm Snatches", duration: 15, description: "15 seconds work" },
+                            { name: "Rest", duration: 15, description: "15 seconds rest" },
+                            // Round 4
+                            { name: "Right Arm Snatches", duration: 15, description: "15 seconds work" },
+                            { name: "Rest", duration: 15, description: "15 seconds rest" },
+                            { name: "Left Arm Snatches", duration: 15, description: "15 seconds work" },
+                            { name: "Rest", duration: 15, description: "15 seconds rest" },
+                            // Round 5
+                            { name: "Right Arm Snatches", duration: 15, description: "15 seconds work" },
+                            { name: "Rest", duration: 15, description: "15 seconds rest" },
+                            { name: "Left Arm Snatches", duration: 15, description: "15 seconds work" },
+                            { name: "Rest", duration: 15, description: "15 seconds rest" },
+                            // Round 6
+                            { name: "Right Arm Snatches", duration: 15, description: "15 seconds work" },
+                            { name: "Rest", duration: 15, description: "15 seconds rest" },
+                            { name: "Left Arm Snatches", duration: 15, description: "15 seconds work" },
+                            { name: "Rest", duration: 15, description: "15 seconds rest" },
+                            // Round 7
+                            { name: "Right Arm Snatches", duration: 15, description: "15 seconds work" },
+                            { name: "Rest", duration: 15, description: "15 seconds rest" },
+                            { name: "Left Arm Snatches", duration: 15, description: "15 seconds work" },
+                            { name: "Rest", duration: 15, description: "15 seconds rest" },
+                            // Round 8
+                            { name: "Right Arm Snatches", duration: 15, description: "15 seconds work" },
+                            { name: "Rest", duration: 15, description: "15 seconds rest" },
+                            { name: "Left Arm Snatches", duration: 15, description: "15 seconds work" },
+                            { name: "Rest", duration: 15, description: "15 seconds rest" },
+                            // Round 9
+                            { name: "Right Arm Snatches", duration: 15, description: "15 seconds work" },
+                            { name: "Rest", duration: 15, description: "15 seconds rest" },
+                            { name: "Left Arm Snatches", duration: 15, description: "15 seconds work" },
+                            { name: "Rest", duration: 15, description: "15 seconds rest" },
+                            // Round 10
+                            { name: "Right Arm Snatches", duration: 15, description: "15 seconds work" },
+                            { name: "Rest", duration: 15, description: "15 seconds rest" },
+                            { name: "Left Arm Snatches", duration: 15, description: "15 seconds work" },
+                            { name: "Rest", duration: 15, description: "15 seconds rest" }
+                        ]
+                    },
+                    {
+                        name: "Recovery",
+                        duration: 3,
+                        exercises: [
+                            { name: "Active Recovery", duration: 180, description: "Walk, shake out arms, hydrate" }
+                        ]
+                    },
+                    {
+                        name: "Optional Finisher",
+                        duration: 4,
+                        exercises: [
+                            { name: "Tabata Swings", duration: 240, description: "8 rounds: 20s work, 10s rest" }
+                        ],
+                        optional: true
+                    },
+                    {
+                        name: "Cooldown",
+                        duration: 5,
+                        exercises: [
+                            { name: "Light Stretching", duration: 180, description: "Shoulders, hamstrings, forearms" },
+                            { name: "Breathing", duration: 120, description: "Deep diaphragmatic breathing" }
+                        ]
+                    }
+                ]
+            },
+            2: {
+                name: "EMOM Strength-Endurance Circuit",
+                focus: "Anaerobic Threshold Training",
+                duration: 30,
+                phases: [
+                    {
+                        name: "Warm-Up",
+                        duration: 5,
+                        exercises: [
+                            { name: "Dynamic Warm-Up", duration: 180, description: "Joint mobility and movement prep" },
+                            { name: "Practice Swings", duration: 120, description: "Light swings and push-ups" }
+                        ]
+                    },
+                    {
+                        name: "12-Minute EMOM Circuit",
+                        duration: 12,
+                        exercises: [
+                            // Round 1
+                            { name: "Swings + Push-Ups", duration: 60, description: "15 swings + 5 push-ups" },
+                            { name: "Goblet Squats", duration: 60, description: "10 goblet squats" },
+                            // Round 2
+                            { name: "Swings + Push-Ups", duration: 60, description: "15 swings + 5 push-ups" },
+                            { name: "Goblet Squats", duration: 60, description: "10 goblet squats" },
+                            // Round 3
+                            { name: "Swings + Push-Ups", duration: 60, description: "15 swings + 5 push-ups" },
+                            { name: "Goblet Squats", duration: 60, description: "10 goblet squats" },
+                            // Round 4
+                            { name: "Swings + Push-Ups", duration: 60, description: "15 swings + 5 push-ups" },
+                            { name: "Goblet Squats", duration: 60, description: "10 goblet squats" },
+                            // Round 5
+                            { name: "Swings + Push-Ups", duration: 60, description: "15 swings + 5 push-ups" },
+                            { name: "Goblet Squats", duration: 60, description: "10 goblet squats" },
+                            // Round 6
+                            { name: "Swings + Push-Ups", duration: 60, description: "15 swings + 5 push-ups" },
+                            { name: "Goblet Squats", duration: 60, description: "10 goblet squats" }
+                        ]
+                    },
+                    {
+                        name: "Farmer's Carry",
+                        duration: 3,
+                        exercises: [
+                            { name: "Right Arm Carry", duration: 30, description: "30 seconds per arm" },
+                            { name: "Left Arm Carry", duration: 30, description: "30 seconds per arm" }
+                        ]
+                    },
+                    {
+                        name: "Cooldown",
+                        duration: 5,
+                        exercises: [
+                            { name: "Stretching", duration: 300, description: "Legs, chest, forearms" }
+                        ]
+                    }
+                ]
+            },
+            3: {
+                name: "Low-Intensity Aerobic + Core",
+                focus: "Active Recovery",
+                duration: 30,
+                phases: [
+                    {
+                        name: "Warm-Up",
+                        duration: 5,
+                        exercises: [
+                            { name: "Mobility Work", duration: 180, description: "Slow arm/leg swings, torso twists" },
+                            { name: "Turkish Get-Up Practice", duration: 120, description: "Light TGU rehearsal" }
+                        ]
+                    },
+                    {
+                        name: "20-Minute Continuous Flow",
+                        duration: 20,
+                        exercises: [
+                            // Round 1
+                            { name: "Turkish Get-Up", duration: 120, description: "1 rep each side" },
+                            { name: "Kettlebell Halos", duration: 30, description: "5 rotations each direction" },
+                            { name: "Goblet Reverse Lunges", duration: 60, description: "5 each leg" },
+                            { name: "Plank Pull-Through", duration: 60, description: "5 each side" },
+                            { name: "Light Jogging", duration: 30, description: "30 seconds easy movement" },
+                            // Round 2
+                            { name: "Turkish Get-Up", duration: 120, description: "1 rep each side" },
+                            { name: "Kettlebell Halos", duration: 30, description: "5 rotations each direction" },
+                            { name: "Goblet Reverse Lunges", duration: 60, description: "5 each leg" },
+                            { name: "Plank Pull-Through", duration: 60, description: "5 each side" },
+                            { name: "Light Jogging", duration: 30, description: "30 seconds easy movement" },
+                            // Round 3
+                            { name: "Turkish Get-Up", duration: 120, description: "1 rep each side" },
+                            { name: "Kettlebell Halos", duration: 30, description: "5 rotations each direction" },
+                            { name: "Goblet Reverse Lunges", duration: 60, description: "5 each leg" },
+                            { name: "Plank Pull-Through", duration: 60, description: "5 each side" },
+                            { name: "Light Jogging", duration: 30, description: "30 seconds easy movement" },
+                            // Round 4
+                            { name: "Turkish Get-Up", duration: 120, description: "1 rep each side" },
+                            { name: "Kettlebell Halos", duration: 30, description: "5 rotations each direction" },
+                            { name: "Goblet Reverse Lunges", duration: 60, description: "5 each leg" },
+                            { name: "Plank Pull-Through", duration: 60, description: "5 each side" },
+                            { name: "Light Jogging", duration: 30, description: "30 seconds easy movement" }
+                        ]
+                    },
+                    {
+                        name: "Cooldown",
+                        duration: 5,
+                        exercises: [
+                            { name: "Static Stretching", duration: 300, description: "Cobra, figure-4, neck stretches" }
+                        ]
+                    }
+                ]
+            },
+            4: {
+                name: "Kettlebell Complex for Power-Endurance",
+                focus: "Full-Body Conditioning",
+                duration: 30,
+                phases: [
+                    {
+                        name: "Warm-Up",
+                        duration: 5,
+                        exercises: [
+                            { name: "Dynamic Warm-Up", duration: 180, description: "Joint mobility and movement prep" },
+                            { name: "Complex Practice", duration: 120, description: "Light practice of complex movements" }
+                        ]
+                    },
+                    {
+                        name: "Kettlebell Complex",
+                        duration: 15,
+                        exercises: [
+                            // Round 1
+                            { name: "Right Arm Complex", duration: 45, description: "5 swings, 5 cleans, 5 presses, 5 squats" },
+                            { name: "Left Arm Complex", duration: 45, description: "5 swings, 5 cleans, 5 presses, 5 squats" },
+                            { name: "Rest", duration: 90, description: "Recovery between rounds" },
+                            // Round 2
+                            { name: "Right Arm Complex", duration: 45, description: "5 swings, 5 cleans, 5 presses, 5 squats" },
+                            { name: "Left Arm Complex", duration: 45, description: "5 swings, 5 cleans, 5 presses, 5 squats" },
+                            { name: "Rest", duration: 90, description: "Recovery between rounds" },
+                            // Round 3
+                            { name: "Right Arm Complex", duration: 45, description: "5 swings, 5 cleans, 5 presses, 5 squats" },
+                            { name: "Left Arm Complex", duration: 45, description: "5 swings, 5 cleans, 5 presses, 5 squats" },
+                            { name: "Rest", duration: 90, description: "Recovery between rounds" },
+                            // Round 4
+                            { name: "Right Arm Complex", duration: 45, description: "5 swings, 5 cleans, 5 presses, 5 squats" },
+                            { name: "Left Arm Complex", duration: 45, description: "5 swings, 5 cleans, 5 presses, 5 squats" },
+                            { name: "Rest", duration: 90, description: "Recovery between rounds" },
+                            // Round 5
+                            { name: "Right Arm Complex", duration: 45, description: "5 swings, 5 cleans, 5 presses, 5 squats" },
+                            { name: "Left Arm Complex", duration: 45, description: "5 swings, 5 cleans, 5 presses, 5 squats" },
+                            { name: "Rest", duration: 90, description: "Recovery between rounds" }
+                        ]
+                    },
+                    {
+                        name: "Optional Finisher",
+                        duration: 2,
+                        exercises: [
+                            { name: "30-20-10 Ladder", duration: 120, description: "High-pulls and burpees" }
+                        ],
+                        optional: true
+                    },
+                    {
+                        name: "Cooldown",
+                        duration: 5,
+                        exercises: [
+                            { name: "Active Stretching", duration: 300, description: "Shoulders, forearms, legs" }
+                        ]
+                    }
+                ]
+            },
+            5: {
+                name: "High-Intensity Grappling Circuit",
+                focus: "AMRAP Rounds for Fight Conditioning",
+                duration: 30,
+                phases: [
+                    {
+                        name: "Warm-Up",
+                        duration: 5,
+                        exercises: [
+                            { name: "Dynamic Warm-Up", duration: 180, description: "Joint mobility and movement prep" },
+                            { name: "Burst Drills", duration: 120, description: "Short high-intensity bursts" }
+                        ]
+                    },
+                    {
+                        name: "Sparring Rounds Circuit",
+                        duration: 12,
+                        exercises: [
+                            { name: "AMRAP Round 1", duration: 180, description: "3 minutes: 5 rows per side, 5 thrusters, 5 burpees, 10 swings" },
+                            { name: "Rest", duration: 60, description: "1 minute recovery" },
+                            { name: "AMRAP Round 2", duration: 180, description: "3 minutes: 5 rows per side, 5 thrusters, 5 burpees, 10 swings" },
+                            { name: "Rest", duration: 60, description: "1 minute recovery" },
+                            { name: "AMRAP Round 3", duration: 180, description: "3 minutes: 5 rows per side, 5 thrusters, 5 burpees, 10 swings" },
+                            { name: "Rest", duration: 60, description: "1 minute recovery" }
+                        ]
+                    },
+                    {
+                        name: "Grip Burnout",
+                        duration: 3,
+                        exercises: [
+                            { name: "Towel Hang", duration: 30, description: "30 seconds per set" },
+                            { name: "Rest", duration: 30, description: "30 seconds rest" }
+                        ],
+                        repeat: 2
+                    },
+                    {
+                        name: "Cooldown",
+                        duration: 5,
+                        exercises: [
+                            { name: "Active Recovery", duration: 300, description: "Walking, stretching, rehydration" }
+                        ]
+                    }
+                ]
+            },
+            6: {
+                name: "BJJ Sparring and Skill Training",
+                focus: "Sport-Specific Day",
+                duration: 90,
+                phases: [
+                    {
+                        name: "Pre-Class Warm-Up",
+                        duration: 10,
+                        exercises: [
+                            { name: "Dynamic Warm-Up", duration: 300, description: "Joint mobility and movement prep" },
+                            { name: "Light Kettlebell Work", duration: 300, description: "Light swings and drills" }
+                        ]
+                    },
+                    {
+                        name: "BJJ Training",
+                        duration: 60,
+                        exercises: [
+                            { name: "Technique Practice", duration: 1200, description: "Drill techniques and movements" },
+                            { name: "Live Sparring", duration: 1800, description: "Intense rolling rounds" },
+                            { name: "Conditioning", duration: 600, description: "Additional conditioning work" }
+                        ]
+                    },
+                    {
+                        name: "Post-Class Cooldown",
+                        duration: 20,
+                        exercises: [
+                            { name: "Stretching", duration: 600, description: "Neck, forearms, back stretches" },
+                            { name: "Light Aerobic", duration: 600, description: "Easy movement for recovery" }
+                        ]
+                    }
+                ]
+            },
+            7: {
+                name: "Rest and Recovery",
+                focus: "Mobility Focus",
+                duration: 30,
+                phases: [
+                    {
+                        name: "Active Recovery",
+                        duration: 30,
+                        exercises: [
+                            { name: "Light Walk/Jog", duration: 600, description: "Easy movement for blood flow" },
+                            { name: "Yoga/Stretching", duration: 600, description: "Gentle stretching routine" },
+                            { name: "Mobility Work", duration: 600, description: "Joint mobility and range of motion" }
+                        ]
+                    }
                 ]
             }
-            // ... (include all other days)
         };
     }
 
     getExerciseLibrary() {
-        // Return the same exercise library as the original
         return {
-            // ... (same as original)
+            "Kettlebell Snatch": {
+                type: "Power",
+                description: "Explosive one-arm kettlebell movement from swing to overhead lockout",
+                cues: [
+                    "Start with a powerful hip hinge",
+                    "Drive the kettlebell up with hip extension",
+                    "Pull the bell to your chest, then punch overhead",
+                    "Lock out the arm overhead with shoulder stability",
+                    "Control the descent back to swing position"
+                ]
+            },
+            "Kettlebell Swing": {
+                type: "Power",
+                description: "Fundamental hip hinge movement with explosive hip extension",
+                cues: [
+                    "Stand with feet shoulder-width apart",
+                    "Hinge at hips, not waist",
+                    "Drive hips forward explosively",
+                    "Let arms follow the momentum",
+                    "Control the backswing between legs"
+                ]
+            },
+            "Turkish Get-Up": {
+                type: "Strength",
+                description: "Complex full-body movement requiring stability and coordination",
+                cues: [
+                    "Start lying on back with KB locked out overhead",
+                    "Roll to elbow, then to hand",
+                    "Bridge up and sweep leg through",
+                    "Lunge up to standing position",
+                    "Reverse the movement back to start"
+                ]
+            },
+            "Goblet Squat": {
+                type: "Strength",
+                description: "Squat holding kettlebell at chest level",
+                cues: [
+                    "Hold kettlebell by the horns at chest",
+                    "Feet slightly wider than shoulder-width",
+                    "Squat down keeping chest up",
+                    "Drive through heels to stand",
+                    "Keep elbows inside knees at bottom"
+                ]
+            },
+            "Kettlebell Press": {
+                type: "Strength",
+                description: "Overhead pressing movement with kettlebell",
+                cues: [
+                    "Start with KB in rack position",
+                    "Press straight up, not forward",
+                    "Lock out arm completely overhead",
+                    "Keep core tight throughout",
+                    "Lower with control to rack position"
+                ]
+            },
+            "Kettlebell Clean": {
+                type: "Power",
+                description: "Explosive movement bringing KB to rack position",
+                cues: [
+                    "Start with KB between legs",
+                    "Drive hips forward explosively",
+                    "Guide KB to rack position",
+                    "Catch with soft knees",
+                    "KB should rest on forearm, not wrist"
+                ]
+            },
+            "Plank": {
+                type: "Core",
+                description: "Isometric core strengthening exercise",
+                cues: [
+                    "Start in push-up position",
+                    "Keep body in straight line",
+                    "Engage core and glutes",
+                    "Breathe normally",
+                    "Don't let hips sag or pike up"
+                ]
+            },
+            "Burpee": {
+                type: "Conditioning",
+                description: "Full-body exercise combining squat, plank, and jump",
+                cues: [
+                    "Start standing, drop to squat",
+                    "Jump feet back to plank",
+                    "Do push-up (optional)",
+                    "Jump feet back to squat",
+                    "Jump up with arms overhead"
+                ]
+            },
+            "Kettlebell Row": {
+                type: "Strength",
+                description: "Rowing movement with kettlebell",
+                cues: [
+                    "Hinge at hips, keep back straight",
+                    "Pull KB to ribs, not chest",
+                    "Squeeze shoulder blade back",
+                    "Control the lowering phase",
+                    "Keep core engaged throughout"
+                ]
+            },
+            "Farmer's Carry": {
+                type: "Strength",
+                description: "Walking with heavy weight for grip and core strength",
+                cues: [
+                    "Stand tall with weight at sides",
+                    "Keep shoulders back and down",
+                    "Take controlled steps",
+                    "Breathe normally",
+                    "Maintain good posture throughout"
+                ]
+            }
         };
     }
 }

@@ -18,7 +18,6 @@ class BJJWorkoutApp {
             voiceRate: 0.9
         };
         
-        // Speech synthesis setup
         this.speechSynthesis = window.speechSynthesis;
         this.speechUtterance = null;
         this.speechQueue = [];
@@ -28,44 +27,23 @@ class BJJWorkoutApp {
         this.bindEvents();
         this.loadSettings();
         this.populateExerciseLibrary();
-        
-        // Initialize speech synthesis after a short delay to ensure it's ready
-        setTimeout(() => {
-            this.initializeSpeech();
-            
-            // Test voice after initialization
-            setTimeout(() => {
-                console.log('Running initial voice test...');
-                this.speak("Voice system ready.", false);
-            }, 2000);
-        }, 1000);
+        this.initializeSpeech();
     }
 
     initializeElements() {
-        // Timer elements
         this.minutesEl = document.getElementById('minutes');
         this.secondsEl = document.getElementById('seconds');
         this.timerLabelEl = document.getElementById('timer-label');
         this.phaseInfoEl = document.getElementById('phase-info');
         this.progressFillEl = document.getElementById('progress-fill');
         this.progressTextEl = document.getElementById('progress-text');
-
-        // Control buttons
         this.startBtn = document.getElementById('start-timer');
         this.resetBtn = document.getElementById('reset-timer');
         this.backBtn = document.getElementById('back-btn');
         this.skipBtn = document.getElementById('skip-btn');
-
-        // Day selection
         this.dayButtons = document.querySelectorAll('.day-btn');
-
-        // Workout details
         this.workoutDetailsEl = document.getElementById('workout-details');
-
-        // Exercise library
         this.exerciseGridEl = document.getElementById('exercise-grid');
-
-        // Settings
         this.settingsBtn = document.getElementById('settings-btn');
         this.settingsContent = document.getElementById('settings-content');
         this.soundEnabledCheckbox = document.getElementById('sound-enabled');
@@ -74,97 +52,45 @@ class BJJWorkoutApp {
         this.voiceEnabledCheckbox = document.getElementById('voice-enabled');
         this.voiceVolumeSlider = document.getElementById('voice-volume');
         this.voiceRateSlider = document.getElementById('voice-rate');
-        this.testVoiceBtn = document.getElementById('test-voice');
-        this.testAnnouncementsBtn = document.getElementById('test-announcements');
-        this.debugProgressBtn = document.getElementById('debug-progress');
-        this.recoverAppBtn = document.getElementById('recover-app');
-
-        // Modal
         this.modal = document.getElementById('exercise-modal');
         this.modalTitle = document.getElementById('modal-title');
         this.modalDescription = document.getElementById('modal-description');
         this.modalCues = document.getElementById('modal-cues');
         this.closeModalBtn = document.getElementById('close-modal');
-
-        // Audio
         this.notificationSound = document.getElementById('notification-sound');
     }
 
     bindEvents() {
-        // Day selection
         this.dayButtons.forEach(btn => {
             btn.addEventListener('click', () => this.selectDay(parseInt(btn.dataset.day)));
         });
-
-        // Timer controls
         this.startBtn.addEventListener('click', () => this.toggleWorkout());
         this.resetBtn.addEventListener('click', () => this.resetWorkout());
         this.backBtn.addEventListener('click', () => this.goBack());
         this.skipBtn.addEventListener('click', () => this.skipExercise());
-
-        // Settings
         this.settingsBtn.addEventListener('click', () => this.toggleSettings());
-        this.soundEnabledCheckbox.addEventListener('change', () => this.saveSettings());
-        this.vibrationEnabledCheckbox.addEventListener('change', () => this.saveSettings());
-        this.autoAdvanceCheckbox.addEventListener('change', () => this.saveSettings());
-        this.voiceEnabledCheckbox.addEventListener('change', () => this.saveSettings());
-        this.voiceVolumeSlider.addEventListener('input', () => this.saveSettings());
-        this.voiceRateSlider.addEventListener('input', () => this.saveSettings());
-        this.testVoiceBtn.addEventListener('click', () => this.testVoice());
-        this.testAnnouncementsBtn.addEventListener('click', () => this.testAnnouncements());
-        this.debugProgressBtn.addEventListener('click', () => this.logWorkoutProgress());
-        this.recoverAppBtn.addEventListener('click', () => this.recoverApp());
-        
-        // Update volume and rate displays
-        this.voiceVolumeSlider.addEventListener('input', () => {
-            document.getElementById('volume-display').textContent = Math.round(this.voiceVolumeSlider.value * 100) + '%';
-        });
-        this.voiceRateSlider.addEventListener('input', () => {
-            document.getElementById('rate-display').textContent = this.voiceRateSlider.value + 'x';
-        });
-
-        // Modal
         this.closeModalBtn.addEventListener('click', () => this.closeModal());
         this.modal.addEventListener('click', (e) => {
             if (e.target === this.modal) this.closeModal();
         });
-        
-        // Keyboard shortcuts
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowLeft' && !this.backBtn.disabled) {
-                this.goBack();
-            } else if (e.key === 'ArrowRight' && !this.skipBtn.disabled) {
-                this.skipExercise();
-            }
-        });
     }
 
     selectDay(day) {
-        console.log('=== SELECT DAY ===');
-        console.log('Selected day:', day);
-        
         this.currentDay = day;
         this.currentWorkout = this.getWorkoutData()[day];
         
-        console.log('Current workout loaded:', this.currentWorkout);
-        console.log('Workout name:', this.currentWorkout?.name);
-        
-        // Update active button
         this.dayButtons.forEach(btn => {
             const isActive = parseInt(btn.dataset.day) === day;
             if (isActive) {
-                btn.classList.remove('border-gray-200', 'bg-white', 'hover:border-bjj-blue', 'hover:bg-blue-50');
+                btn.classList.remove('border-gray-200', 'bg-white');
                 btn.classList.add('border-bjj-blue', 'bg-gradient-to-br', 'from-bjj-blue', 'to-bjj-light-blue', 'text-white', 'shadow-lg');
             } else {
                 btn.classList.remove('border-bjj-blue', 'bg-gradient-to-br', 'from-bjj-blue', 'to-bjj-light-blue', 'text-white', 'shadow-lg');
-                btn.classList.add('border-gray-200', 'bg-white', 'hover:border-bjj-blue', 'hover:bg-blue-50');
+                btn.classList.add('border-gray-200', 'bg-white');
             }
         });
 
-        // Update workout details
         this.displayWorkoutDetails();
-        
-        // Reset timer
         this.resetWorkout();
         this.updateNavigationButtons();
     }
@@ -198,9 +124,10 @@ class BJJWorkoutApp {
     populateExerciseLibrary() {
         const exercises = this.getExerciseLibrary();
         this.exerciseGridEl.innerHTML = Object.entries(exercises).map(([name, data]) => `
-            <div class="bg-gray-50 rounded-2xl p-5 cursor-pointer transition-all duration-300 border-2 border-transparent hover:border-bjj-blue hover:bg-white hover:-translate-y-1 hover:shadow-lg" onclick="app.showExerciseModal('${name}')">
+            <div class="bg-white rounded-xl p-6 border border-gray-200 hover:border-bjj-blue hover:shadow-lg transition-all duration-300 cursor-pointer" 
+                 onclick="app.showExerciseModal('${name}')">
                 <h4 class="text-bjj-blue mb-3 text-lg font-semibold">${name}</h4>
-                <p class="text-gray-600 text-sm leading-relaxed mb-3">${data.description}</p>
+                <p class="text-gray-600 text-sm mb-3">${data.description}</p>
                 <span class="inline-block bg-bjj-blue text-white px-3 py-1 rounded-full text-xs font-medium">${data.type}</span>
             </div>
         `).join('');
@@ -212,13 +139,17 @@ class BJJWorkoutApp {
 
         this.modalTitle.textContent = exerciseName;
         this.modalDescription.textContent = exercise.description;
-        this.modalCues.innerHTML = exercise.cues.map(cue => `<li class="py-2 border-b border-gray-200 text-gray-600 last:border-b-0 before:content-['•'] before:text-bjj-blue before:font-bold before:mr-3">${cue}</li>`).join('');
-        
-        this.modal.classList.remove('hidden');
+        this.modalCues.innerHTML = exercise.cues.map(cue => 
+            `<li class="py-2 border-b border-gray-200 text-gray-600 last:border-b-0">${cue}</li>`
+        ).join('');
+
+        this.modal.classList.add('modal--active');
+        this.modal.setAttribute('aria-hidden', 'false');
     }
 
     closeModal() {
-        this.modal.classList.add('hidden');
+        this.modal.classList.remove('modal--active');
+        this.modal.setAttribute('aria-hidden', 'true');
     }
 
     toggleWorkout() {
@@ -230,294 +161,131 @@ class BJJWorkoutApp {
     }
 
     startWorkout() {
-        console.log('=== START WORKOUT ===');
-        console.log('Current workout:', this.currentWorkout);
-        console.log('Is running:', this.isRunning);
-        
         if (!this.currentWorkout) {
-            console.log('No current workout selected');
+            alert('Please select a workout first');
             return;
         }
 
         this.isRunning = true;
+        this.startBtn.innerHTML = '<i data-lucide="pause" class="w-5 h-5 mr-2"></i>Pause';
         
-        // Check if we're resuming from a pause or starting fresh
-        const isResuming = this.currentPhase > 0 || this.currentExercise > 0 || this.timeRemaining > 0;
-        console.log('Is resuming:', isResuming);
-        console.log('Current phase:', this.currentPhase, 'Current exercise:', this.currentExercise, 'Time remaining:', this.timeRemaining);
-        
-        if (!isResuming) {
-            // Starting fresh - reset to beginning
-            console.log('Starting fresh workout');
-            this.currentPhase = 0;
-            this.currentExercise = 0;
-            this.timeRemaining = 0;
-            this.phaseStartTime = 0;
-            this.phaseElapsedTime = 0;
-            this.startNextPhase();
-        } else {
-            // Resuming from pause - just restart the timer
-            console.log('Resuming from pause');
-            this.startTimer();
+        // Reinitialize Lucide icons after HTML change
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
         }
         
-        this.startBtn.textContent = 'Pause';
-        this.startBtn.classList.remove('bg-green-500', 'hover:bg-green-600');
-        this.startBtn.classList.add('bg-blue-500', 'hover:bg-blue-600');
-        
-        // Update navigation buttons
+        if (this.currentPhase === 0 && this.currentExercise === 0) {
+            this.startNextPhase();
+        } else {
+            this.startTimer();
+        }
+
         this.updateNavigationButtons();
     }
 
     startNextPhase() {
-        console.log('startNextPhase called, currentPhase:', this.currentPhase);
-        if (!this.isRunning || !this.currentWorkout) return;
-
         const phases = this.currentWorkout.phases;
-        console.log('Total phases:', phases.length);
         
         if (this.currentPhase >= phases.length) {
-            console.log('All phases complete');
             this.completeWorkout();
             return;
         }
 
         const phase = phases[this.currentPhase];
-        console.log('Starting phase:', phase.name, 'Phase duration:', phase.duration, 'minutes');
-        
-        // Initialize phase timing
         this.phaseStartTime = Date.now();
-        this.phaseElapsedTime = 0;
         this.currentExercise = 0;
-        console.log('Phase timing initialized - start time:', this.phaseStartTime);
-        
-        this.timerLabelEl.textContent = phase.name;
-        this.phaseInfoEl.textContent = `Phase ${this.currentPhase + 1} of ${phases.length}`;
-        
-        // Announce the phase (not priority, so exercise will follow)
-        console.log('Announcing phase:', phase.name);
-        this.announcePhase(phase, false);
+        this.phaseInfoEl.textContent = `Phase ${this.currentPhase + 1}: ${phase.name}`;
         
         this.startNextExercise();
     }
 
     startNextExercise() {
-        console.log('startNextExercise called, currentExercise:', this.currentExercise);
+        const phases = this.currentWorkout.phases;
+        const phase = phases[this.currentPhase];
         
-        try {
-            if (!this.isRunning || !this.currentWorkout) {
-                console.log('Cannot start next exercise - not running or no workout');
-                return;
-            }
+        if (this.currentExercise >= phase.exercises.length) {
+            this.currentPhase++;
+            this.startNextPhase();
+            return;
+        }
 
-            const phases = this.currentWorkout.phases;
-            
-            // Validate current phase
-            if (this.currentPhase >= phases.length) {
-                console.log('Current phase out of bounds, completing workout');
-                this.completeWorkout();
-                return;
-            }
-            
-            const phase = phases[this.currentPhase];
-            console.log('Current phase:', phase.name, 'Phase exercises:', phase.exercises.length);
-            console.log('Current exercise index:', this.currentExercise);
-            
-            // Calculate phase elapsed time
-            this.phaseElapsedTime = (Date.now() - this.phaseStartTime) / 1000; // Convert to seconds
-            
-            // Validate current exercise index
-            if (this.currentExercise >= phase.exercises.length) {
-                console.log('Current exercise index out of bounds, resetting to 0');
-                this.currentExercise = 0;
-            }
-
-            const exercise = phase.exercises[this.currentExercise];
-            console.log('Starting exercise:', exercise.name, 'Duration:', exercise.duration);
-            
-            // Calculate which round we're in (for display purposes)
-            const roundDuration = phase.exercises.reduce((sum, ex) => sum + ex.duration, 0);
-            const completedRounds = Math.floor(this.phaseElapsedTime / roundDuration);
-            const currentRound = completedRounds + 1;
-            
-            this.timerLabelEl.textContent = exercise.name;
-            this.phaseInfoEl.textContent = `${phase.name} - Round ${currentRound} (${Math.floor(this.phaseElapsedTime / 60)}:${Math.floor(this.phaseElapsedTime % 60).toString().padStart(2, '0')})`;
-            
-            // Set the exercise duration
-            this.timeRemaining = exercise.duration;
-            this.updateDisplay();
-            
-            // Announce the exercise and start timer immediately
-            console.log('About to announce exercise:', exercise.name);
-            console.log('Voice enabled:', this.settings.voiceEnabled);
-            console.log('Speech synthesis available:', !!this.speechSynthesis);
-            
-            // Add a small delay to ensure speech synthesis is ready
-            setTimeout(() => {
-                this.announceExercise(exercise, phase.name, this.currentExercise + 1, phase.exercises.length);
-                this.startTimer();
-            }, 500);
-            
-            // Update navigation buttons
-            this.updateNavigationButtons();
-            
-        } catch (error) {
-            console.error('Error in startNextExercise:', error);
-            // Try to recover
-            this.isRunning = false;
-            if (this.timer) {
-                clearInterval(this.timer);
-                this.timer = null;
-            }
+        const exercise = phase.exercises[this.currentExercise];
+        this.timeRemaining = exercise.duration;
+        this.timerLabelEl.textContent = `${exercise.name} - ${exercise.description}`;
+        
+        this.updateDisplay();
+        this.startTimer();
+        
+        if (this.settings.voiceEnabled) {
+            this.speak(`${exercise.name}. ${exercise.description}`);
         }
     }
 
     startTimer() {
-        if (this.timer) clearInterval(this.timer);
-        
         this.timer = setInterval(() => {
-            if (!this.isRunning) {
-                clearInterval(this.timer);
-                this.timer = null;
-                return;
-            }
-            
             this.timeRemaining--;
-            this.phaseElapsedTime = (Date.now() - this.phaseStartTime) / 1000;
             this.updateDisplay();
-            
-            // 5-second countdown at the end of exercise
-            if (this.timeRemaining === 5) {
-                this.speak("Five seconds remaining", true);
-            } else if (this.timeRemaining === 4) {
-                this.speak("Four", true);
-            } else if (this.timeRemaining === 3) {
-                this.speak("Three", true);
-            } else if (this.timeRemaining === 2) {
-                this.speak("Two", true);
-            } else if (this.timeRemaining === 1) {
-                this.speak("One", true);
-            }
             
             if (this.timeRemaining <= 0) {
                 clearInterval(this.timer);
                 this.timer = null;
-                this.notify();
-                this.nextExercise();
-            }
-        }, 1000);
-    }
-
-    nextExercise() {
-        console.log('nextExercise called');
-        
-        try {
-            if (!this.isRunning) {
-                console.log('Workout is not running, not proceeding');
-                return;
-            }
-            
-            if (!this.currentWorkout) {
-                console.log('No current workout, not proceeding');
-                return;
-            }
-            
-            // Stop current timer safely
-            if (this.timer) {
-                clearInterval(this.timer);
-                this.timer = null;
-                console.log('Timer stopped in nextExercise');
-            }
-
-            this.currentExercise++;
-            console.log('Incremented to exercise:', this.currentExercise);
-            
-            const phases = this.currentWorkout.phases;
-            
-            // Validate current phase
-            if (this.currentPhase >= phases.length) {
-                console.log('Current phase out of bounds, completing workout');
-                this.completeWorkout();
-                return;
-            }
-            
-            const phase = phases[this.currentPhase];
-            console.log('Current phase:', phase.name, 'Total exercises in phase:', phase.exercises.length);
-            
-            // Check if phase duration has been reached
-            this.phaseElapsedTime = (Date.now() - this.phaseStartTime) / 1000;
-            const phaseDurationSeconds = phase.duration * 60;
-            
-            if (this.phaseElapsedTime >= phaseDurationSeconds) {
-                console.log('Phase duration reached, moving to next phase');
-                this.currentPhase++;
+                this.currentExercise++;
+                
                 if (this.settings.autoAdvance) {
-                    this.startNextPhase();
-                } else {
-                    this.pauseWorkout();
-                }
-            } else {
-                console.log('Continuing with next exercise in same phase');
-                if (this.settings.autoAdvance) {
-                    // Check if we need to cycle back to first exercise
-                    if (this.currentExercise >= phase.exercises.length) {
-                        console.log('Completed all exercises in phase, cycling back to first exercise');
-                        this.currentExercise = 0;
-                    }
                     this.startNextExercise();
                 } else {
                     this.pauseWorkout();
                 }
             }
-            
-        } catch (error) {
-            console.error('Error in nextExercise:', error);
-            // Try to recover
-            this.isRunning = false;
-            if (this.timer) {
-                clearInterval(this.timer);
-                this.timer = null;
-            }
-        }
+        }, 1000);
     }
 
     pauseWorkout() {
-        console.log('=== PAUSE WORKOUT ===');
         this.isRunning = false;
+        
+        // Stop any current speech when pausing
+        if (this.speechSynthesis) {
+            this.speechSynthesis.cancel();
+            this.speechQueue = [];
+            this.isSpeaking = false;
+        }
         
         if (this.timer) {
             clearInterval(this.timer);
             this.timer = null;
         }
+        this.startBtn.innerHTML = '<i data-lucide="play" class="w-5 h-5 mr-2"></i>Resume';
         
-        // Clear any ongoing speech
-        this.speechSynthesis.cancel();
-        this.speechQueue = [];
-        this.isSpeaking = false;
-        
-        this.startBtn.textContent = 'Resume';
-        this.startBtn.classList.remove('bg-blue-500', 'hover:bg-blue-600');
-        this.startBtn.classList.add('bg-green-500', 'hover:bg-green-600');
-        
-        console.log('Workout paused');
+        // Reinitialize Lucide icons after HTML change
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
     }
 
     resetWorkout() {
-        console.log('=== RESET WORKOUT ===');
         this.pauseWorkout();
+        
+        // Stop any current speech when resetting
+        if (this.speechSynthesis) {
+            this.speechSynthesis.cancel();
+            this.speechQueue = [];
+            this.isSpeaking = false;
+        }
+        
         this.currentPhase = 0;
         this.currentExercise = 0;
         this.timeRemaining = 0;
         this.phaseStartTime = 0;
         this.phaseElapsedTime = 0;
         
-        console.log('Reset complete - Phase:', this.currentPhase, 'Exercise:', this.currentExercise, 'Time:', this.timeRemaining);
-        
-        this.startBtn.textContent = 'Start Workout';
-        this.timerLabelEl.textContent = 'Select a workout';
+        this.startBtn.innerHTML = '<i data-lucide="play" class="w-5 h-5 mr-2"></i>Start Workout';
+        this.timerLabelEl.textContent = this.currentWorkout ? 'Ready to start' : 'Select a workout';
         this.phaseInfoEl.textContent = '';
-        this.progressTextEl.textContent = 'Ready to begin';
-        this.progressFillEl.style.width = '0%';
+        
+        // Reinitialize Lucide icons after HTML change
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
         
         this.updateDisplay();
         this.updateNavigationButtons();
@@ -532,15 +300,16 @@ class BJJWorkoutApp {
         
         this.timerLabelEl.textContent = 'Workout Complete!';
         this.phaseInfoEl.textContent = 'Great job!';
-        this.progressTextEl.textContent = 'Workout finished';
-        this.progressFillEl.style.width = '100%';
+        this.startBtn.innerHTML = '<i data-lucide="play" class="w-5 h-5 mr-2"></i>Start Workout';
         
-        this.startBtn.textContent = 'Start Workout';
-        this.startBtn.classList.remove('bg-blue-500', 'hover:bg-blue-600');
-        this.startBtn.classList.add('bg-green-500', 'hover:bg-green-600');
+        // Reinitialize Lucide icons after HTML change
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
         
-        this.notify();
-        this.announceWorkoutComplete();
+        if (this.settings.voiceEnabled) {
+            this.speak('Workout complete! Great job!');
+        }
     }
 
     updateDisplay() {
@@ -550,383 +319,157 @@ class BJJWorkoutApp {
         this.minutesEl.textContent = minutes.toString().padStart(2, '0');
         this.secondsEl.textContent = seconds.toString().padStart(2, '0');
         
-        // Update progress based on current phase
-        if (this.currentWorkout && this.currentPhase < this.currentWorkout.phases.length) {
-            const phase = this.currentWorkout.phases[this.currentPhase];
-            const phaseDurationSeconds = phase.duration * 60;
-            const phaseProgress = (this.phaseElapsedTime / phaseDurationSeconds) * 100;
-            this.progressFillEl.style.width = Math.min(phaseProgress, 100) + '%';
+        if (this.currentWorkout) {
+            const totalExercises = this.currentWorkout.phases.reduce((sum, phase) => sum + phase.exercises.length, 0);
+            const completedExercises = this.currentWorkout.phases.slice(0, this.currentPhase).reduce((sum, phase) => sum + phase.exercises.length, 0) + this.currentExercise;
+            const progress = (completedExercises / totalExercises) * 100;
             
-            // Update progress text with current position
-            const phases = this.currentWorkout.phases;
-            if (this.currentPhase < phases.length) {
-                const currentPhase = phases[this.currentPhase];
-                const exercise = currentPhase.exercises[this.currentExercise];
-                if (exercise) {
-                    const phaseTimeRemaining = Math.max(0, phaseDurationSeconds - this.phaseElapsedTime);
-                    const phaseMinutes = Math.floor(phaseTimeRemaining / 60);
-                    const phaseSeconds = Math.floor(phaseTimeRemaining % 60);
-                    this.progressTextEl.textContent = `Phase ${this.currentPhase + 1}/${phases.length} - ${phaseMinutes}:${phaseSeconds.toString().padStart(2, '0')} remaining`;
-                }
-            }
+            this.progressFillEl.style.width = `${progress}%`;
+            this.progressTextEl.textContent = `${completedExercises} of ${totalExercises} exercises`;
         }
     }
 
-    notify() {
-        if (this.settings.soundEnabled) {
-            this.notificationSound.currentTime = 0;
-            this.notificationSound.play().catch(e => console.log('Audio play failed:', e));
-        }
+    skipExercise() {
+        if (!this.isRunning || !this.currentWorkout) return;
         
-        if (this.settings.vibrationEnabled && navigator.vibrate) {
-            navigator.vibrate(200);
-        }
-    }
-
-    // Initialize speech synthesis
-    initializeSpeech() {
-        if ('speechSynthesis' in window) {
-            // Wait for voices to load
-            speechSynthesis.onvoiceschanged = () => {
-                console.log('Speech synthesis ready');
-            };
-            
-            // Force voices to load
-            speechSynthesis.getVoices();
-        } else {
-            console.warn('Speech synthesis not supported');
-        }
-    }
-
-    // Speech synthesis methods
-    speak(text, priority = false) {
-        console.log('=== SPEAK CALLED ===');
-        console.log('Text:', text, 'Priority:', priority);
-        console.log('Voice enabled:', this.settings.voiceEnabled);
-        console.log('Speech synthesis available:', !!this.speechSynthesis);
-        console.log('Speech synthesis speaking:', this.speechSynthesis ? this.speechSynthesis.speaking : 'N/A');
-        console.log('Speech queue length:', this.speechQueue.length);
-        console.log('Is speaking:', this.isSpeaking);
-        
-        if (!this.settings.voiceEnabled || !this.speechSynthesis) {
-            console.log('Voice disabled or not supported');
-            return;
-        }
-        
-        // If priority, clear queue and current speech
-        if (priority) {
-            console.log('Priority speech - clearing queue and current speech');
+        // Stop any current speech
+        if (this.speechSynthesis) {
             this.speechSynthesis.cancel();
             this.speechQueue = [];
             this.isSpeaking = false;
         }
-        
-        // Add to queue
-        this.speechQueue.push(text);
-        console.log('Added to queue. Queue length now:', this.speechQueue.length);
-        
-        // Process queue if not currently speaking
-        if (!this.isSpeaking) {
-            console.log('Not currently speaking, processing queue');
-            this.processSpeechQueue();
-        } else {
-            console.log('Currently speaking, will process queue later');
-        }
-    }
-
-    processSpeechQueue() {
-        if (this.speechQueue.length === 0 || this.isSpeaking) {
-            return;
-        }
-        
-        this.isSpeaking = true;
-        const text = this.speechQueue.shift();
-        
-        try {
-            // Create new utterance
-            this.speechUtterance = new SpeechSynthesisUtterance(text);
-            this.speechUtterance.volume = this.settings.voiceVolume;
-            this.speechUtterance.rate = this.settings.voiceRate;
-            this.speechUtterance.pitch = 1.0;
-            
-            // Try to use a good voice
-            const voices = this.speechSynthesis.getVoices();
-            console.log('Available voices:', voices.length);
-            if (voices.length > 0) {
-                const preferredVoice = voices.find(voice => 
-                    voice.lang.includes('en') && (voice.name.includes('Google') || voice.name.includes('Samantha') || voice.name.includes('Microsoft'))
-                ) || voices[0];
-                this.speechUtterance.voice = preferredVoice;
-                console.log('Using voice:', preferredVoice.name);
-            }
-            
-            // Set up event handlers
-            this.speechUtterance.onend = () => {
-                console.log('Speech ended:', text);
-                this.isSpeaking = false;
-                // Process next item in queue
-                setTimeout(() => this.processSpeechQueue(), 100);
-            };
-            
-            this.speechUtterance.onerror = (error) => {
-                console.error('Speech error:', error);
-                this.isSpeaking = false;
-                // Process next item in queue
-                setTimeout(() => this.processSpeechQueue(), 100);
-            };
-            
-            console.log('Speaking:', text);
-            this.speechSynthesis.speak(this.speechUtterance);
-        } catch (error) {
-            console.error('Speech synthesis error:', error);
-            this.isSpeaking = false;
-            // Process next item in queue
-            setTimeout(() => this.processSpeechQueue(), 100);
-        }
-    }
-
-    announcePhase(phase, priority = false) {
-        console.log('announcePhase called with:', phase.name);
-        const message = `${phase.name}.`;
-        console.log('Speaking phase message:', message);
-        this.speak(message, priority);
-    }
-
-    announceExercise(exercise, phaseName, exerciseNumber, totalExercises) {
-        console.log('announceExercise called with:', exercise.name);
-        console.log('Phase:', phaseName, 'Exercise:', exerciseNumber, 'of', totalExercises);
-        const message = `${exercise.name}.`;
-        console.log('Speaking exercise message:', message);
-        console.log('Voice enabled:', this.settings.voiceEnabled);
-        this.speak(message, true);
-    }
-
-    announceRest() {
-        const message = `Rest.`;
-        this.speak(message, true);
-    }
-
-    announceWorkoutComplete() {
-        const message = "Workout complete! Great job!";
-        this.speak(message, true);
-    }
-
-    testVoice() {
-        console.log('=== VOICE TEST ===');
-        console.log('Testing voice...');
-        console.log('Voice enabled:', this.settings.voiceEnabled);
-        console.log('Speech synthesis available:', !!this.speechSynthesis);
-        console.log('Speech synthesis state:', this.speechSynthesis ? 'speaking: ' + this.speechSynthesis.speaking : 'N/A');
-        
-        // Force voice initialization
-        this.initializeSpeech();
-        
-        const testMessage = "Voice test successful.";
-        console.log('Attempting to speak:', testMessage);
-        this.speak(testMessage, true);
-        
-        // Test if we can access voices
-        const voices = this.speechSynthesis.getVoices();
-        console.log('Available voices:', voices.map(v => v.name + ' (' + v.lang + ')'));
-    }
-
-    testAnnouncements() {
-        console.log('=== TEST ANNOUNCEMENTS ===');
-        
-        // Test phase announcement
-        const testPhase = { name: "Warm-Up" };
-        console.log('Testing phase announcement...');
-        this.announcePhase(testPhase);
-        
-        // Test exercise announcement
-        setTimeout(() => {
-            const testExercise = { name: "Kettlebell Snatch" };
-            console.log('Testing exercise announcement...');
-            this.announceExercise(testExercise, "Warm-Up", 1, 3);
-        }, 2000);
-    }
-
-    // Recovery method to reset app state if it gets stuck
-    recoverApp() {
-        console.log('=== APP RECOVERY ===');
-        
-        // Stop everything
-        this.isRunning = false;
         
         if (this.timer) {
             clearInterval(this.timer);
             this.timer = null;
         }
         
-        // Clear speech
-        try {
-            if (this.speechSynthesis) {
-                this.speechSynthesis.cancel();
+        this.currentExercise++;
+        const phases = this.currentWorkout.phases;
+        const phase = phases[this.currentPhase];
+        
+        if (this.currentExercise >= phase.exercises.length) {
+            this.currentPhase++;
+            this.currentExercise = 0;
+            
+            if (this.currentPhase >= phases.length) {
+                this.completeWorkout();
+                return;
             }
-        } catch (e) {
-            console.log('Error clearing speech during recovery:', e);
+            
+            this.startNextPhase();
+        } else {
+            this.startNextExercise();
         }
         
-        this.speechQueue = [];
-        this.isSpeaking = false;
-        
-        // Reset UI
-        this.startBtn.textContent = 'Start Workout';
-        this.startBtn.classList.remove('bg-blue-500', 'hover:bg-blue-600');
-        this.startBtn.classList.add('bg-green-500', 'hover:bg-green-600');
-        
-        this.timerLabelEl.textContent = 'Select a workout';
-        this.phaseInfoEl.textContent = '';
-        this.progressTextEl.textContent = 'Ready to begin';
-        this.progressFillEl.style.width = '0%';
-        
-        this.updateDisplay();
         this.updateNavigationButtons();
+    }
+
+    goBack() {
+        if (!this.isRunning || !this.currentWorkout) return;
         
-        console.log('App recovered and reset');
+        // Stop any current speech
+        if (this.speechSynthesis) {
+            this.speechSynthesis.cancel();
+            this.speechQueue = [];
+            this.isSpeaking = false;
+        }
+        
+        if (this.timer) {
+            clearInterval(this.timer);
+            this.timer = null;
+        }
+        
+        this.currentExercise--;
+        
+        if (this.currentExercise < 0) {
+            this.currentPhase--;
+            if (this.currentPhase < 0) {
+                this.currentPhase = 0;
+                this.currentExercise = 0;
+            } else {
+                const phase = this.currentWorkout.phases[this.currentPhase];
+                this.currentExercise = phase.exercises.length - 1;
+            }
+        }
+        
+        this.startNextExercise();
+        this.updateNavigationButtons();
+    }
+
+    updateNavigationButtons() {
+        if (this.backBtn) {
+            this.backBtn.disabled = this.currentExercise === 0 && this.currentPhase === 0;
+        }
+        
+        if (this.skipBtn) {
+            this.skipBtn.disabled = !this.isRunning;
+        }
     }
 
     toggleSettings() {
-        this.settingsContent.classList.toggle('hidden');
+        this.settingsContent.classList.toggle('settings-content--active');
     }
 
     loadSettings() {
-        const saved = localStorage.getItem('bjjWorkoutSettings');
-        console.log('Loading settings from localStorage:', saved);
+        try {
+            const saved = localStorage.getItem('bjj-workout-settings');
+            if (saved) {
+                this.settings = { ...this.settings, ...JSON.parse(saved) };
+            }
+        } catch (error) {
+            console.warn('Failed to load settings:', error);
+        }
+    }
+
+    initializeSpeech() {
+        if (!this.speechSynthesis) return;
+        console.log('Speech synthesis ready');
+    }
+
+    speak(text, priority = false) {
+        if (!this.settings.voiceEnabled || !this.speechSynthesis) return;
         
-        if (saved) {
-            this.settings = { ...this.settings, ...JSON.parse(saved) };
-            console.log('Loaded settings:', this.settings);
+        if (priority) {
+            this.speechSynthesis.cancel();
+            this.speechQueue = [];
         }
         
-        // Apply settings to UI elements
-        this.soundEnabledCheckbox.checked = this.settings.soundEnabled;
-        this.vibrationEnabledCheckbox.checked = this.settings.vibrationEnabled;
-        this.autoAdvanceCheckbox.checked = this.settings.autoAdvance;
-        this.voiceEnabledCheckbox.checked = this.settings.voiceEnabled;
-        this.voiceVolumeSlider.value = this.settings.voiceVolume;
-        this.voiceRateSlider.value = this.settings.voiceRate;
-        
-        // Update displays
-        document.getElementById('volume-display').textContent = Math.round(this.settings.voiceVolume * 100) + '%';
-        document.getElementById('rate-display').textContent = this.settings.voiceRate + 'x';
-        
-        console.log('Voice enabled after loading:', this.settings.voiceEnabled);
+        this.speechQueue.push(text);
+        this.processSpeechQueue();
     }
 
-    saveSettings() {
-        this.settings.soundEnabled = this.soundEnabledCheckbox.checked;
-        this.settings.vibrationEnabled = this.vibrationEnabledCheckbox.checked;
-        this.settings.autoAdvance = this.autoAdvanceCheckbox.checked;
-        this.settings.voiceEnabled = this.voiceEnabledCheckbox.checked;
-        this.settings.voiceVolume = parseFloat(this.voiceVolumeSlider.value);
-        this.settings.voiceRate = parseFloat(this.voiceRateSlider.value);
+    processSpeechQueue() {
+        if (this.isSpeaking || this.speechQueue.length === 0) return;
         
-        console.log('Saving settings:', this.settings);
-        localStorage.setItem('bjjWorkoutSettings', JSON.stringify(this.settings));
+        const text = this.speechQueue.shift();
+        const utterance = new SpeechSynthesisUtterance(text);
+        
+        utterance.volume = this.settings.voiceVolume;
+        utterance.rate = this.settings.voiceRate;
+        
+        utterance.onstart = () => {
+            this.isSpeaking = true;
+        };
+        
+        utterance.onend = () => {
+            this.isSpeaking = false;
+            setTimeout(() => this.processSpeechQueue(), 100);
+        };
+        
+        utterance.onerror = () => {
+            this.isSpeaking = false;
+            setTimeout(() => this.processSpeechQueue(), 100);
+        };
+        
+        this.speechSynthesis.speak(utterance);
     }
 
-    // Workout Data
     getWorkoutData() {
         return {
             1: {
-                name: "High-Intensity Kettlebell Snatch Intervals",
-                focus: "VO₂max Booster",
-                duration: 30,
-                phases: [
-                    {
-                        name: "Warm-Up",
-                        duration: 5,
-                        exercises: [
-                            { name: "Joint Mobilization", duration: 120, description: "Neck, shoulder, and hip circles" },
-                            { name: "Dynamic Movements", duration: 120, description: "Arm swings, leg swings, inchworms" },
-                            { name: "Kettlebell Prep", duration: 60, description: "Halos, light swings" }
-                        ]
-                    },
-                    {
-                        name: "15:15 Snatch Intervals",
-                        duration: 10,
-                        exercises: [
-                            // Round 1
-                            { name: "Right Arm Snatches", duration: 15, description: "15 seconds work" },
-                            { name: "Rest", duration: 15, description: "15 seconds rest" },
-                            { name: "Left Arm Snatches", duration: 15, description: "15 seconds work" },
-                            { name: "Rest", duration: 15, description: "15 seconds rest" },
-                            // Round 2
-                            { name: "Right Arm Snatches", duration: 15, description: "15 seconds work" },
-                            { name: "Rest", duration: 15, description: "15 seconds rest" },
-                            { name: "Left Arm Snatches", duration: 15, description: "15 seconds work" },
-                            { name: "Rest", duration: 15, description: "15 seconds rest" },
-                            // Round 3
-                            { name: "Right Arm Snatches", duration: 15, description: "15 seconds work" },
-                            { name: "Rest", duration: 15, description: "15 seconds rest" },
-                            { name: "Left Arm Snatches", duration: 15, description: "15 seconds work" },
-                            { name: "Rest", duration: 15, description: "15 seconds rest" },
-                            // Round 4
-                            { name: "Right Arm Snatches", duration: 15, description: "15 seconds work" },
-                            { name: "Rest", duration: 15, description: "15 seconds rest" },
-                            { name: "Left Arm Snatches", duration: 15, description: "15 seconds work" },
-                            { name: "Rest", duration: 15, description: "15 seconds rest" },
-                            // Round 5
-                            { name: "Right Arm Snatches", duration: 15, description: "15 seconds work" },
-                            { name: "Rest", duration: 15, description: "15 seconds rest" },
-                            { name: "Left Arm Snatches", duration: 15, description: "15 seconds work" },
-                            { name: "Rest", duration: 15, description: "15 seconds rest" },
-                            // Round 6
-                            { name: "Right Arm Snatches", duration: 15, description: "15 seconds work" },
-                            { name: "Rest", duration: 15, description: "15 seconds rest" },
-                            { name: "Left Arm Snatches", duration: 15, description: "15 seconds work" },
-                            { name: "Rest", duration: 15, description: "15 seconds rest" },
-                            // Round 7
-                            { name: "Right Arm Snatches", duration: 15, description: "15 seconds work" },
-                            { name: "Rest", duration: 15, description: "15 seconds rest" },
-                            { name: "Left Arm Snatches", duration: 15, description: "15 seconds work" },
-                            { name: "Rest", duration: 15, description: "15 seconds rest" },
-                            // Round 8
-                            { name: "Right Arm Snatches", duration: 15, description: "15 seconds work" },
-                            { name: "Rest", duration: 15, description: "15 seconds rest" },
-                            { name: "Left Arm Snatches", duration: 15, description: "15 seconds work" },
-                            { name: "Rest", duration: 15, description: "15 seconds rest" },
-                            // Round 9
-                            { name: "Right Arm Snatches", duration: 15, description: "15 seconds work" },
-                            { name: "Rest", duration: 15, description: "15 seconds rest" },
-                            { name: "Left Arm Snatches", duration: 15, description: "15 seconds work" },
-                            { name: "Rest", duration: 15, description: "15 seconds rest" },
-                            // Round 10
-                            { name: "Right Arm Snatches", duration: 15, description: "15 seconds work" },
-                            { name: "Rest", duration: 15, description: "15 seconds rest" },
-                            { name: "Left Arm Snatches", duration: 15, description: "15 seconds work" },
-                            { name: "Rest", duration: 15, description: "15 seconds rest" }
-                        ]
-                    },
-                    {
-                        name: "Recovery",
-                        duration: 3,
-                        exercises: [
-                            { name: "Active Recovery", duration: 180, description: "Walk, shake out arms, hydrate" }
-                        ]
-                    },
-                    {
-                        name: "Optional Finisher",
-                        duration: 4,
-                        exercises: [
-                            { name: "Tabata Swings", duration: 240, description: "8 rounds: 20s work, 10s rest" }
-                        ],
-                        optional: true
-                    },
-                    {
-                        name: "Cooldown",
-                        duration: 5,
-                        exercises: [
-                            { name: "Light Stretching", duration: 180, description: "Shoulders, hamstrings, forearms" },
-                            { name: "Breathing", duration: 120, description: "Deep diaphragmatic breathing" }
-                        ]
-                    }
-                ]
-            },
-            2: {
-                name: "EMOM Strength-Endurance Circuit",
-                focus: "Anaerobic Threshold Training",
+                name: "Kettlebell Snatch Intervals",
+                focus: "Power and Explosiveness",
                 duration: 30,
                 phases: [
                     {
@@ -934,53 +477,99 @@ class BJJWorkoutApp {
                         duration: 5,
                         exercises: [
                             { name: "Dynamic Warm-Up", duration: 180, description: "Joint mobility and movement prep" },
-                            { name: "Practice Swings", duration: 120, description: "Light swings and push-ups" }
+                            { name: "Light Kettlebell Swings", duration: 120, description: "15-20 light swings" }
                         ]
                     },
                     {
-                        name: "12-Minute EMOM Circuit",
-                        duration: 12,
+                        name: "Snatch Practice",
+                        duration: 5,
                         exercises: [
-                            // Round 1
-                            { name: "Swings + Push-Ups", duration: 60, description: "15 swings + 5 push-ups" },
-                            { name: "Goblet Squats", duration: 60, description: "10 goblet squats" },
-                            // Round 2
-                            { name: "Swings + Push-Ups", duration: 60, description: "15 swings + 5 push-ups" },
-                            { name: "Goblet Squats", duration: 60, description: "10 goblet squats" },
-                            // Round 3
-                            { name: "Swings + Push-Ups", duration: 60, description: "15 swings + 5 push-ups" },
-                            { name: "Goblet Squats", duration: 60, description: "10 goblet squats" },
-                            // Round 4
-                            { name: "Swings + Push-Ups", duration: 60, description: "15 swings + 5 push-ups" },
-                            { name: "Goblet Squats", duration: 60, description: "10 goblet squats" },
-                            // Round 5
-                            { name: "Swings + Push-Ups", duration: 60, description: "15 swings + 5 push-ups" },
-                            { name: "Goblet Squats", duration: 60, description: "10 goblet squats" },
-                            // Round 6
-                            { name: "Swings + Push-Ups", duration: 60, description: "15 swings + 5 push-ups" },
-                            { name: "Goblet Squats", duration: 60, description: "10 goblet squats" }
+                            { name: "Snatch Technique", duration: 300, description: "Practice form with light weight" }
                         ]
                     },
                     {
-                        name: "Farmer's Carry",
-                        duration: 3,
+                        name: "Interval Training",
+                        duration: 15,
                         exercises: [
-                            { name: "Right Arm Carry", duration: 30, description: "30 seconds per arm" },
-                            { name: "Left Arm Carry", duration: 30, description: "30 seconds per arm" }
+                            { name: "Right Arm Snatches", duration: 30, description: "30 seconds max reps" },
+                            { name: "Rest", duration: 30, description: "30 seconds recovery" },
+                            { name: "Left Arm Snatches", duration: 30, description: "30 seconds max reps" },
+                            { name: "Rest", duration: 30, description: "30 seconds recovery" },
+                            { name: "Right Arm Snatches", duration: 30, description: "30 seconds max reps" },
+                            { name: "Rest", duration: 30, description: "30 seconds recovery" },
+                            { name: "Left Arm Snatches", duration: 30, description: "30 seconds max reps" },
+                            { name: "Rest", duration: 30, description: "30 seconds recovery" },
+                            { name: "Right Arm Snatches", duration: 30, description: "30 seconds max reps" },
+                            { name: "Rest", duration: 30, description: "30 seconds recovery" },
+                            { name: "Left Arm Snatches", duration: 30, description: "30 seconds max reps" },
+                            { name: "Rest", duration: 30, description: "30 seconds recovery" },
+                            { name: "Right Arm Snatches", duration: 30, description: "30 seconds max reps" },
+                            { name: "Rest", duration: 30, description: "30 seconds recovery" },
+                            { name: "Left Arm Snatches", duration: 30, description: "30 seconds max reps" },
+                            { name: "Rest", duration: 30, description: "30 seconds recovery" }
                         ]
                     },
                     {
                         name: "Cooldown",
                         duration: 5,
                         exercises: [
-                            { name: "Stretching", duration: 300, description: "Legs, chest, forearms" }
+                            { name: "Light Movement", duration: 180, description: "Easy walking and stretching" },
+                            { name: "Breathing Exercise", duration: 120, description: "Deep breathing for recovery" }
+                        ]
+                    }
+                ]
+            },
+            2: {
+                name: "EMOM Kettlebell Circuit",
+                focus: "Strength-Endurance",
+                duration: 30,
+                phases: [
+                    {
+                        name: "Warm-Up",
+                        duration: 5,
+                        exercises: [
+                            { name: "Dynamic Warm-Up", duration: 180, description: "Joint mobility and movement prep" },
+                            { name: "Movement Practice", duration: 120, description: "Practice all movements" }
+                        ]
+                    },
+                    {
+                        name: "EMOM Circuit",
+                        duration: 20,
+                        exercises: [
+                            { name: "Minute 1: Swings", duration: 60, description: "20 swings, rest remainder" },
+                            { name: "Minute 2: Goblet Squats", duration: 60, description: "15 squats, rest remainder" },
+                            { name: "Minute 3: Single-Arm Rows", duration: 60, description: "10 each arm, rest remainder" },
+                            { name: "Minute 4: Push-Ups", duration: 60, description: "10-15 reps, rest remainder" },
+                            { name: "Minute 5: Swings", duration: 60, description: "20 swings, rest remainder" },
+                            { name: "Minute 6: Goblet Squats", duration: 60, description: "15 squats, rest remainder" },
+                            { name: "Minute 7: Single-Arm Rows", duration: 60, description: "10 each arm, rest remainder" },
+                            { name: "Minute 8: Push-Ups", duration: 60, description: "10-15 reps, rest remainder" },
+                            { name: "Minute 9: Swings", duration: 60, description: "20 swings, rest remainder" },
+                            { name: "Minute 10: Goblet Squats", duration: 60, description: "15 squats, rest remainder" },
+                            { name: "Minute 11: Single-Arm Rows", duration: 60, description: "10 each arm, rest remainder" },
+                            { name: "Minute 12: Push-Ups", duration: 60, description: "10-15 reps, rest remainder" },
+                            { name: "Minute 13: Swings", duration: 60, description: "20 swings, rest remainder" },
+                            { name: "Minute 14: Goblet Squats", duration: 60, description: "15 squats, rest remainder" },
+                            { name: "Minute 15: Single-Arm Rows", duration: 60, description: "10 each arm, rest remainder" },
+                            { name: "Minute 16: Push-Ups", duration: 60, description: "10-15 reps, rest remainder" },
+                            { name: "Minute 17: Swings", duration: 60, description: "20 swings, rest remainder" },
+                            { name: "Minute 18: Goblet Squats", duration: 60, description: "15 squats, rest remainder" },
+                            { name: "Minute 19: Single-Arm Rows", duration: 60, description: "10 each arm, rest remainder" },
+                            { name: "Minute 20: Push-Ups", duration: 60, description: "10-15 reps, rest remainder" }
+                        ]
+                    },
+                    {
+                        name: "Cooldown",
+                        duration: 5,
+                        exercises: [
+                            { name: "Active Stretching", duration: 300, description: "Full body stretching routine" }
                         ]
                     }
                 ]
             },
             3: {
-                name: "Low-Intensity Aerobic + Core",
-                focus: "Active Recovery",
+                name: "Aerobic Base and Core Strength",
+                focus: "Endurance and Core",
                 duration: 30,
                 phases: [
                     {
@@ -999,9 +588,23 @@ class BJJWorkoutApp {
                             { name: "Kettlebell Halos", duration: 30, description: "5 rotations each direction" },
                             { name: "Goblet Reverse Lunges", duration: 60, description: "5 each leg" },
                             { name: "Plank Pull-Through", duration: 60, description: "5 each side" },
+                            { name: "Light Jogging", duration: 30, description: "30 seconds easy movement" },
+                            { name: "Turkish Get-Up", duration: 120, description: "1 rep each side" },
+                            { name: "Kettlebell Halos", duration: 30, description: "5 rotations each direction" },
+                            { name: "Goblet Reverse Lunges", duration: 60, description: "5 each leg" },
+                            { name: "Plank Pull-Through", duration: 60, description: "5 each side" },
+                            { name: "Light Jogging", duration: 30, description: "30 seconds easy movement" },
+                            { name: "Turkish Get-Up", duration: 120, description: "1 rep each side" },
+                            { name: "Kettlebell Halos", duration: 30, description: "5 rotations each direction" },
+                            { name: "Goblet Reverse Lunges", duration: 60, description: "5 each leg" },
+                            { name: "Plank Pull-Through", duration: 60, description: "5 each side" },
+                            { name: "Light Jogging", duration: 30, description: "30 seconds easy movement" },
+                            { name: "Turkish Get-Up", duration: 120, description: "1 rep each side" },
+                            { name: "Kettlebell Halos", duration: 30, description: "5 rotations each direction" },
+                            { name: "Goblet Reverse Lunges", duration: 60, description: "5 each leg" },
+                            { name: "Plank Pull-Through", duration: 60, description: "5 each side" },
                             { name: "Light Jogging", duration: 30, description: "30 seconds easy movement" }
-                        ],
-                        repeat: 4
+                        ]
                     },
                     {
                         name: "Cooldown",
@@ -1029,26 +632,20 @@ class BJJWorkoutApp {
                         name: "Kettlebell Complex",
                         duration: 15,
                         exercises: [
-                            // Round 1
                             { name: "Right Arm Complex", duration: 45, description: "5 swings, 5 cleans, 5 presses, 5 squats" },
                             { name: "Left Arm Complex", duration: 45, description: "5 swings, 5 cleans, 5 presses, 5 squats" },
                             { name: "Rest", duration: 90, description: "Recovery between rounds" },
-                            // Round 2
                             { name: "Right Arm Complex", duration: 45, description: "5 swings, 5 cleans, 5 presses, 5 squats" },
                             { name: "Left Arm Complex", duration: 45, description: "5 swings, 5 cleans, 5 presses, 5 squats" },
                             { name: "Rest", duration: 90, description: "Recovery between rounds" },
-                            // Round 3
                             { name: "Right Arm Complex", duration: 45, description: "5 swings, 5 cleans, 5 presses, 5 squats" },
                             { name: "Left Arm Complex", duration: 45, description: "5 swings, 5 cleans, 5 presses, 5 squats" },
                             { name: "Rest", duration: 90, description: "Recovery between rounds" },
-                            // Round 4
                             { name: "Right Arm Complex", duration: 45, description: "5 swings, 5 cleans, 5 presses, 5 squats" },
                             { name: "Left Arm Complex", duration: 45, description: "5 swings, 5 cleans, 5 presses, 5 squats" },
                             { name: "Rest", duration: 90, description: "Recovery between rounds" },
-                            // Round 5
                             { name: "Right Arm Complex", duration: 45, description: "5 swings, 5 cleans, 5 presses, 5 squats" },
-                            { name: "Left Arm Complex", duration: 45, description: "5 swings, 5 cleans, 5 presses, 5 squats" },
-                            { name: "Rest", duration: 90, description: "Recovery between rounds" }
+                            { name: "Left Arm Complex", duration: 45, description: "5 swings, 5 cleans, 5 presses, 5 squats" }
                         ]
                     },
                     {
@@ -1056,8 +653,7 @@ class BJJWorkoutApp {
                         duration: 2,
                         exercises: [
                             { name: "30-20-10 Ladder", duration: 120, description: "High-pulls and burpees" }
-                        ],
-                        optional: true
+                        ]
                     },
                     {
                         name: "Cooldown",
@@ -1098,9 +694,12 @@ class BJJWorkoutApp {
                         duration: 3,
                         exercises: [
                             { name: "Towel Hang", duration: 30, description: "30 seconds per set" },
+                            { name: "Rest", duration: 30, description: "30 seconds rest" },
+                            { name: "Towel Hang", duration: 30, description: "30 seconds per set" },
+                            { name: "Rest", duration: 30, description: "30 seconds rest" },
+                            { name: "Towel Hang", duration: 30, description: "30 seconds per set" },
                             { name: "Rest", duration: 30, description: "30 seconds rest" }
-                        ],
-                        repeat: 2
+                        ]
                     },
                     {
                         name: "Cooldown",
@@ -1162,7 +761,6 @@ class BJJWorkoutApp {
         };
     }
 
-    // Exercise Library
     getExerciseLibrary() {
         return {
             "Kettlebell Snatch": {
@@ -1189,24 +787,46 @@ class BJJWorkoutApp {
             },
             "Turkish Get-Up": {
                 type: "Strength",
-                description: "Complex full-body movement requiring stability and coordination",
+                description: "Complex full-body movement from lying to standing with kettlebell overhead",
                 cues: [
-                    "Start lying on back with KB locked out overhead",
+                    "Start lying down with kettlebell pressed overhead",
+                    "Keep eyes on the bell throughout movement",
                     "Roll to elbow, then to hand",
                     "Bridge up and sweep leg through",
-                    "Lunge up to standing position",
-                    "Reverse the movement back to start"
+                    "Stand up while maintaining overhead position"
                 ]
             },
             "Goblet Squat": {
                 type: "Strength",
-                description: "Front-loaded squat with kettlebell held at chest",
+                description: "Front-loaded squat holding kettlebell at chest level",
                 cues: [
-                    "Hold KB at chest with elbows in",
-                    "Keep chest up and core tight",
-                    "Squat down with full depth",
+                    "Hold kettlebell close to chest",
+                    "Feet shoulder-width apart",
+                    "Squat down keeping chest up",
                     "Drive through heels to stand",
-                    "Maintain upright posture throughout"
+                    "Keep knees tracking over toes"
+                ]
+            },
+            "Single-Arm Row": {
+                type: "Strength",
+                description: "Unilateral pulling movement for back and core strength",
+                cues: [
+                    "Hinge at hips with one hand supported",
+                    "Pull kettlebell to hip",
+                    "Keep core tight and spine neutral",
+                    "Control the descent",
+                    "Squeeze shoulder blade at top"
+                ]
+            },
+            "Kettlebell Press": {
+                type: "Strength",
+                description: "Overhead pressing movement with kettlebell",
+                cues: [
+                    "Start with bell in rack position",
+                    "Press straight up overhead",
+                    "Keep core tight",
+                    "Lock out arm completely",
+                    "Control the descent back to rack"
                 ]
             },
             "Kettlebell Clean": {
@@ -1214,318 +834,53 @@ class BJJWorkoutApp {
                 description: "Explosive movement bringing kettlebell to rack position",
                 cues: [
                     "Start with swing motion",
-                    "Pull bell to chest explosively",
-                    "Receive in rack position at shoulder",
-                    "Keep elbow close to body",
-                    "Control the movement smoothly"
+                    "Pull bell up close to body",
+                    "Flip bell over hand into rack",
+                    "Absorb with slight knee bend",
+                    "Keep wrist straight"
                 ]
             },
-            "Overhead Press": {
-                type: "Strength",
-                description: "Strict press or push-press of kettlebell overhead",
-                cues: [
-                    "Start with KB in rack position",
-                    "Brace core and maintain posture",
-                    "Press directly overhead",
-                    "Lock out arm at top",
-                    "Control descent back to rack"
-                ]
-            },
-            "Farmer's Carry": {
-                type: "Endurance",
-                description: "Unilateral carry exercise for grip and core stability",
-                cues: [
-                    "Hold KB in one hand like a suitcase",
-                    "Keep shoulders level and core tight",
-                    "Walk with good posture",
-                    "Breathe steadily throughout",
-                    "Switch hands for balance"
-                ]
-            },
-            "Push-Up": {
-                type: "Strength",
-                description: "Bodyweight upper body pushing exercise",
+            "Plank Pull-Through": {
+                type: "Core",
+                description: "Anti-rotation core exercise with dynamic component",
                 cues: [
                     "Start in plank position",
-                    "Lower chest to ground",
-                    "Keep body in straight line",
-                    "Push back up explosively",
-                    "Maintain core tension throughout"
+                    "Reach under body to grab kettlebell",
+                    "Pull through to opposite side",
+                    "Maintain plank throughout",
+                    "Resist rotation of hips"
                 ]
             },
-            "Burpee": {
-                type: "Conditioning",
-                description: "Full-body conditioning exercise combining squat, push-up, and jump",
-                cues: [
-                    "Start standing, drop to squat",
-                    "Kick feet back to plank",
-                    "Perform push-up",
-                    "Jump feet back to squat",
-                    "Explode up with jump"
-                ]
-            },
-            "Kettlebell Halo": {
+            "Kettlebell Halos": {
                 type: "Mobility",
-                description: "Shoulder mobility exercise with kettlebell rotation",
+                description: "Shoulder mobility exercise moving kettlebell around head",
                 cues: [
-                    "Hold KB by the horns at chest",
-                    "Circle around head in both directions",
-                    "Keep core tight throughout",
-                    "Maintain shoulder stability",
-                    "Move slowly and controlled"
+                    "Hold kettlebell by horns",
+                    "Circle around head slowly",
+                    "Keep core engaged",
+                    "Maintain good posture",
+                    "Control the movement"
                 ]
             },
-            "One-Arm Kettlebell Row": {
+            "Goblet Reverse Lunge": {
                 type: "Strength",
-                description: "Unilateral rowing movement targeting upper back and grip",
+                description: "Backward stepping lunge with front-loaded weight",
                 cues: [
-                    "Staggered stance, hinge at hips",
-                    "Row KB up with elbow close to ribs",
-                    "Keep core braced and glutes engaged",
-                    "Control the descent back down",
-                    "Alternate sides for balance"
-                ]
-            },
-            "Kettlebell Thruster": {
-                type: "Power",
-                description: "Combined goblet squat and push press for full-body power",
-                cues: [
-                    "Hold KB at chest, do full deep squat",
-                    "Explode up and press KB overhead",
-                    "Use leg drive to assist the press",
-                    "Control descent back to squat",
-                    "Maintain upright posture throughout"
-                ]
-            },
-            "Towel Hang": {
-                type: "Endurance",
-                description: "Grip endurance exercise using towel and kettlebell",
-                cues: [
-                    "Loop towel through KB handle",
-                    "Hold towel ends with both hands",
-                    "Let KB hang while maintaining grip",
-                    "Keep shoulders engaged and core tight",
-                    "Hold for time or until grip fails"
+                    "Hold kettlebell at chest",
+                    "Step back into lunge",
+                    "Lower back knee toward ground",
+                    "Push through front heel to return",
+                    "Keep torso upright"
                 ]
             }
         };
     }
-
-    logWorkoutProgress() {
-        if (!this.currentWorkout) return;
-        
-        const phases = this.currentWorkout.phases;
-        console.log('=== WORKOUT PROGRESS ===');
-        console.log('Current phase:', this.currentPhase + 1, 'of', phases.length);
-        console.log('Current exercise:', this.currentExercise + 1, 'of', phases[this.currentPhase]?.exercises.length || 0);
-        console.log('Time remaining:', this.timeRemaining);
-        console.log('Is running:', this.isRunning);
-    }
-
-    skipExercise() {
-        console.log('=== SKIP EXERCISE ===');
-        console.log('Current phase:', this.currentPhase, 'Current exercise:', this.currentExercise);
-        
-        try {
-            if (!this.currentWorkout) {
-                console.log('No current workout selected');
-                return;
-            }
-            
-            if (!this.isRunning) {
-                console.log('Workout is not running');
-                return;
-            }
-            
-            // Stop current timer safely
-            if (this.timer) {
-                clearInterval(this.timer);
-                this.timer = null;
-                console.log('Timer stopped');
-            }
-            
-            // Clear any ongoing speech safely
-            try {
-                if (this.speechSynthesis && this.speechSynthesis.speaking) {
-                    this.speechSynthesis.cancel();
-                }
-            } catch (e) {
-                console.log('Error clearing speech:', e);
-            }
-            
-            this.speechQueue = [];
-            this.isSpeaking = false;
-            
-            const phases = this.currentWorkout.phases;
-            
-            // Check if we've completed all phases
-            if (this.currentPhase >= phases.length) {
-                console.log('All phases complete');
-                this.completeWorkout();
-                return;
-            }
-            
-            const phase = phases[this.currentPhase];
-            
-            // Move to next exercise within the current phase
-            this.currentExercise++;
-            
-            // If we've completed all exercises in this phase, move to next phase
-            if (this.currentExercise >= phase.exercises.length) {
-                console.log('Completed all exercises in phase, moving to next phase');
-                this.currentPhase++;
-                this.currentExercise = 0;
-                
-                // Check if we've completed all phases
-                if (this.currentPhase >= phases.length) {
-                    console.log('All phases complete');
-                    this.completeWorkout();
-                    return;
-                }
-            }
-            
-            console.log('New position - Phase:', this.currentPhase, 'Exercise:', this.currentExercise);
-            this.startNextExercise();
-            
-            // Update navigation buttons after the change
-            this.updateNavigationButtons();
-            
-        } catch (error) {
-            console.error('Error in skipExercise:', error);
-            // Try to recover by resetting state
-            this.isRunning = false;
-            if (this.timer) {
-                clearInterval(this.timer);
-                this.timer = null;
-            }
-        }
-    }
-
-    goBack() {
-        console.log('=== GO BACK ===');
-        
-        try {
-            if (!this.currentWorkout) {
-                console.log('No current workout selected');
-                return;
-            }
-            
-            if (!this.isRunning) {
-                console.log('Workout is not running');
-                return;
-            }
-            
-            // Stop current timer safely
-            if (this.timer) {
-                clearInterval(this.timer);
-                this.timer = null;
-                console.log('Timer stopped in goBack');
-            }
-            
-            // Clear any ongoing speech safely
-            try {
-                if (this.speechSynthesis && this.speechSynthesis.speaking) {
-                    this.speechSynthesis.cancel();
-                }
-            } catch (e) {
-                console.log('Error clearing speech:', e);
-            }
-            
-            this.speechQueue = [];
-            this.isSpeaking = false;
-            
-            // Move directly to previous exercise without announcing
-            console.log('Executing previousExercise after goBack');
-            this.previousExercise();
-            
-        } catch (error) {
-            console.error('Error in goBack:', error);
-            // Try to recover by resetting state
-            this.isRunning = false;
-            if (this.timer) {
-                clearInterval(this.timer);
-                this.timer = null;
-            }
-        }
-    }
-
-    previousExercise() {
-        console.log('previousExercise called');
-        
-        try {
-            if (!this.isRunning) {
-                console.log('Workout is not running, not proceeding');
-                return;
-            }
-            
-            if (!this.currentWorkout) {
-                console.log('No current workout, not proceeding');
-                return;
-            }
-
-            // Move to previous exercise (could be in same phase or previous phase)
-            this.currentExercise--;
-            
-            // Check if we need to move to previous phase
-            if (this.currentExercise < 0) {
-                this.currentPhase--;
-                
-                // Check if we've gone before the first phase
-                if (this.currentPhase < 0) {
-                    console.log('At the beginning, cannot go back further');
-                    this.currentPhase = 0;
-                    this.currentExercise = 0;
-                } else {
-                    // Go to last exercise of previous phase
-                    const phase = this.currentWorkout.phases[this.currentPhase];
-                    this.currentExercise = phase.exercises.length - 1;
-                }
-            }
-            
-            console.log('New position - Phase:', this.currentPhase, 'Exercise:', this.currentExercise);
-            
-            // Ensure we're still running before starting next exercise
-            if (this.isRunning && this.currentWorkout) {
-                this.startNextExercise();
-            }
-            
-        } catch (error) {
-            console.error('Error in previousExercise:', error);
-            // Try to recover
-            this.isRunning = false;
-            if (this.timer) {
-                clearInterval(this.timer);
-                this.timer = null;
-            }
-        }
-    }
-
-    updateNavigationButtons() {
-        if (!this.currentWorkout) {
-            this.backBtn.disabled = true;
-            this.skipBtn.disabled = true;
-            return;
-        }
-        
-        const phases = this.currentWorkout.phases;
-        
-        // Back button is disabled if we're at the very beginning
-        const isAtBeginning = this.currentPhase === 0 && this.currentExercise === 0;
-        this.backBtn.disabled = isAtBeginning;
-        
-        // Skip button is disabled if we're at the very end (last exercise of last phase)
-        const isAtLastPhase = this.currentPhase >= phases.length - 1;
-        const isAtLastExercise = isAtLastPhase && this.currentExercise >= phases[this.currentPhase].exercises.length - 1;
-        
-        this.skipBtn.disabled = isAtLastExercise;
-        
-        console.log('Navigation buttons updated - Back disabled:', isAtBeginning, 'Skip disabled:', isAtLastExercise);
-        console.log('Current phase:', this.currentPhase, 'Current exercise:', this.currentExercise);
-    }
 }
 
-// Initialize the app
-let app;
 document.addEventListener('DOMContentLoaded', () => {
-    app = new BJJWorkoutApp();
+    window.app = new BJJWorkoutApp();
+    
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
 }); 

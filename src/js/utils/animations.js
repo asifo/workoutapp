@@ -166,6 +166,61 @@ export class AnimationManager {
         }, 600);
     }
 
+    // Celebration animation for workout completion
+    celebrationAnimation(element) {
+        // Add celebration class with keyframe animation
+        element.classList.add('celebration-pulse');
+        
+        // Create confetti-like effect
+        this.createConfettiEffect(element);
+        
+        // Remove class after animation
+        setTimeout(() => {
+            element.classList.remove('celebration-pulse');
+        }, 2000);
+    }
+
+    // Create confetti effect
+    createConfettiEffect(targetElement) {
+        const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7'];
+        const rect = targetElement.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+
+        for (let i = 0; i < 20; i++) {
+            const confetti = document.createElement('div');
+            confetti.style.cssText = `
+                position: fixed;
+                width: 8px;
+                height: 8px;
+                background: ${colors[Math.floor(Math.random() * colors.length)]};
+                border-radius: 50%;
+                pointer-events: none;
+                z-index: 10000;
+                left: ${centerX}px;
+                top: ${centerY}px;
+            `;
+
+            document.body.appendChild(confetti);
+
+            // Animate confetti
+            const angle = (Math.PI * 2 * i) / 20;
+            const velocity = 150 + Math.random() * 100;
+            const vx = Math.cos(angle) * velocity;
+            const vy = Math.sin(angle) * velocity - 200; // Add upward bias
+
+            confetti.animate([
+                { transform: 'translate(0, 0) scale(1)', opacity: 1 },
+                { transform: `translate(${vx}px, ${vy}px) scale(0)`, opacity: 0 }
+            ], {
+                duration: 1500,
+                easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+            }).onfinish = () => {
+                document.body.removeChild(confetti);
+            };
+        }
+    }
+
     // Slide in animation
     slideIn(element, direction = 'left', duration = 300) {
         const directions = {
