@@ -112,6 +112,7 @@ class ModernBJJWorkoutApp extends EventEmitter {
             resetBtn: DOM.$('#reset-timer'),
             backBtn: DOM.$('#back-btn'),
             skipBtn: DOM.$('#skip-btn'),
+            fullscreenBtn: DOM.$('#fullscreen-btn'),
 
             // Day selection
             dayButtons: DOM.$$('.day-btn'),
@@ -154,6 +155,9 @@ class ModernBJJWorkoutApp extends EventEmitter {
         if (missing.length > 0) {
             throw new Error(`Critical elements missing: ${missing.join(', ')}`);
         }
+        
+        // Log fullscreen button status for debugging
+        console.log('Fullscreen button element:', this.elements.fullscreenBtn);
     }
 
     bindEvents() {
@@ -187,6 +191,36 @@ class ModernBJJWorkoutApp extends EventEmitter {
             this.hapticFeedback();
         });
 
+        if (this.elements.fullscreenBtn) {
+            // Use both DOM helper and direct addEventListener for reliability
+            DOM.on(this.elements.fullscreenBtn, 'click', () => {
+                console.log('Fullscreen button clicked via DOM helper');
+                this.toggleFullscreen();
+                this.hapticFeedback();
+            });
+            
+            // Also try direct event listener as backup
+            this.elements.fullscreenBtn.addEventListener('click', () => {
+                console.log('Fullscreen button clicked via direct listener');
+                this.toggleFullscreen();
+                this.hapticFeedback();
+            });
+        } else {
+            console.warn('Fullscreen button not found in DOM');
+            // Try to find it directly
+            const fullscreenBtn = document.getElementById('fullscreen-btn');
+            if (fullscreenBtn) {
+                console.log('Found fullscreen button directly, binding event');
+                fullscreenBtn.addEventListener('click', () => {
+                    console.log('Fullscreen button clicked via direct finder');
+                    this.toggleFullscreen();
+                    this.hapticFeedback();
+                });
+                // Update the cached element
+                this.elements.fullscreenBtn = fullscreenBtn;
+            }
+        }
+
         // Settings with debounced handlers
         DOM.on(this.elements.settingsBtn, 'click', () => {
             this.toggleSettings();
@@ -218,6 +252,10 @@ class ModernBJJWorkoutApp extends EventEmitter {
         window.addEventListener('resize', this.handleResize, { passive: true });
         document.addEventListener('visibilitychange', this.handleVisibilityChange);
         document.addEventListener('keydown', this.handleKeydown);
+        document.addEventListener('fullscreenchange', this.handleFullscreenChange.bind(this));
+        document.addEventListener('webkitfullscreenchange', this.handleFullscreenChange.bind(this));
+        document.addEventListener('mozfullscreenchange', this.handleFullscreenChange.bind(this));
+        document.addEventListener('MSFullscreenChange', this.handleFullscreenChange.bind(this));
 
         // Touch/swipe gestures for mobile
         if (DeviceUtils.isTouchDevice()) {
@@ -274,6 +312,16 @@ class ModernBJJWorkoutApp extends EventEmitter {
             this.elements.settingsBtn.setAttribute('aria-label', 'Open settings');
             this.elements.settingsBtn.setAttribute('aria-expanded', 'false');
         }
+
+        // Initialize fullscreen button
+        if (this.elements.fullscreenBtn) {
+            this.updateFullscreenButton(false);
+        }
+
+        // Add a delayed backup binding for fullscreen
+        setTimeout(() => {
+            this.ensureFullscreenFunctionality();
+        }, 500); // Reduced delay since main issues are fixed
     }
 
     setupPerformanceOptimizations() {
@@ -301,6 +349,9 @@ class ModernBJJWorkoutApp extends EventEmitter {
         if (this.speechSynthesis) {
             this.speechSynthesis.getVoices();
         }
+
+        // Ensure fullscreen styles are loaded
+        this.ensureFullscreenStyles();
     }
 
     setupPerformanceObserver() {
@@ -354,16 +405,234 @@ class ModernBJJWorkoutApp extends EventEmitter {
         document.addEventListener('touchend', handleTouchEnd, { passive: true });
     }
 
-    async setupPWA() {
-        // Register service worker
-        if ('serviceWorker' in navigator) {
-            try {
-                await navigator.serviceWorker.register('/sw.js');
-                console.log('Service Worker registered');
-            } catch (error) {
-                console.warn('Service Worker registration failed:', error);
+    // Fullscreen functionality
+    toggleFullscreen() {
+        console.log('toggleFullscreen called, isFullscreen:', this.isFullscreen());
+        if (this.isFullscreen()) {
+            this.exitFullscreen();
+        } else {
+            this.enterFullscreen();
+        }
+    }
+
+    async enterFullscreen() {
+        console.log('enterFullscreen called');
+        try {
+            const timerContainer = DOM.$('#timer-container') || this.elements.timerDisplay.parentElement;
+            console.log('Timer container found:', !!timerContainer);
+            
+            if (!timerContainer) {
+                console.warn('Timer container not found for fullscreen');
+                return;
+            }
+
+            // Add fullscreen class before entering fullscreen
+            DOM.addClass(document.body, 'fullscreen-mode');
+            DOM.addClass(timerContainer, 'timer-fullscreen');
+            
+            // Ensure timer container has the necessary structure for fullscreen
+            this.prepareTimerForFullscreen(timerContainer);
+
+            // Request fullscreen using the most compatible method
+            console.log('Requesting fullscreen...');
+            let fullscreenRequested = false;
+            
+            if (timerContainer.requestFullscreen) {
+                console.log('Using requestFullscreen');
+                await timerContainer.requestFullscreen();
+                fullscreenRequested = true;
+            } else if (timerContainer.webkitRequestFullscreen) {
+                console.log('Using webkitRequestFullscreen');
+                await timerContainer.webkitRequestFullscreen();
+                fullscreenRequested = true;
+            } else if (timerContainer.mozRequestFullScreen) {
+                console.log('Using mozRequestFullScreen');
+                await timerContainer.mozRequestFullScreen();
+                fullscreenRequested = true;
+            } else if (timerContainer.msRequestFullscreen) {
+                console.log('Using msRequestFullscreen');
+                await timerContainer.msRequestFullscreen();
+                fullscreenRequested = true;
+            } else {
+                console.log('No fullscreen API available, using CSS fallback');
+                // Fallback: simulate fullscreen with CSS
+                this.simulateFullscreen(timerContainer);
+            }
+
+            if (fullscreenRequested || DOM.hasClass(timerContainer, 'timer-fullscreen-simulated')) {
+                this.updateFullscreenButton(true);
+                A11yUtils.announceToScreenReader('Entered fullscreen mode');
+                this.emit('fullscreen:enter');
+                console.log('Fullscreen mode activated');
+            }
+            
+        } catch (error) {
+            console.warn('Fullscreen request failed:', error);
+            // Fallback to CSS-only fullscreen
+            console.log('Falling back to CSS-only fullscreen');
+            this.simulateFullscreen(timerContainer);
+            this.updateFullscreenButton(true);
+        }
+    }
+
+    exitFullscreen() {
+        try {
+            // Remove CSS classes
+            DOM.removeClass(document.body, 'fullscreen-mode');
+            const timerContainer = DOM.$('#timer-container') || this.elements.timerDisplay.parentElement;
+            if (timerContainer) {
+                DOM.removeClass(timerContainer, 'timer-fullscreen');
+                DOM.removeClass(timerContainer, 'timer-fullscreen-simulated');
+            }
+
+            // Exit fullscreen using the most compatible method
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            }
+
+            this.updateFullscreenButton(false);
+            A11yUtils.announceToScreenReader('Exited fullscreen mode');
+            
+            this.emit('fullscreen:exit');
+            
+        } catch (error) {
+            console.warn('Exit fullscreen failed:', error);
+        }
+    }
+
+    simulateFullscreen(container) {
+        console.log('simulateFullscreen called');
+        if (!container) {
+            container = DOM.$('#timer-container') || this.elements.timerDisplay.parentElement;
+        }
+        
+        console.log('Container for simulated fullscreen:', container);
+        
+        if (container) {
+            DOM.addClass(document.body, 'fullscreen-mode');
+            DOM.addClass(container, 'timer-fullscreen');
+            DOM.addClass(container, 'timer-fullscreen-simulated');
+            console.log('CSS classes added for simulated fullscreen');
+        } else {
+            console.error('No container found for simulated fullscreen');
+        }
+    }
+
+    isFullscreen() {
+        return !!(
+            document.fullscreenElement ||
+            document.webkitFullscreenElement ||
+            document.mozFullScreenElement ||
+            document.msFullscreenElement ||
+            DOM.hasClass(document.body, 'fullscreen-mode')
+        );
+    }
+
+    handleFullscreenChange() {
+        const isFullscreen = this.isFullscreen();
+        
+        if (!isFullscreen) {
+            // Clean up when exiting fullscreen
+            DOM.removeClass(document.body, 'fullscreen-mode');
+            const timerContainer = DOM.$('#timer-container') || this.elements.timerDisplay.parentElement;
+            if (timerContainer) {
+                DOM.removeClass(timerContainer, 'timer-fullscreen');
+                DOM.removeClass(timerContainer, 'timer-fullscreen-simulated');
             }
         }
+        
+        this.updateFullscreenButton(isFullscreen);
+        this.emit('fullscreen:change', { isFullscreen });
+    }
+
+    prepareTimerForFullscreen(container) {
+        // Ensure the timer container has proper classes and structure for fullscreen
+        if (!container) return;
+        
+        // Add timer controls to the container if they exist
+        const timerControls = DOM.$('.timer-controls') || this.createTimerControls();
+        if (timerControls && !container.contains(timerControls)) {
+            container.appendChild(timerControls);
+        }
+        
+        // Make sure progress elements are accessible
+        const progressContainer = DOM.$('.progress-container');
+        if (progressContainer && !container.contains(progressContainer)) {
+            // Create a clone or ensure progress is visible
+            const progressElements = container.querySelectorAll('.progress-bar, #progress-text');
+            if (progressElements.length === 0) {
+                console.warn('Progress elements not found in timer container for fullscreen');
+            }
+        }
+    }
+
+    createTimerControls() {
+        // Create timer controls container if it doesn't exist
+        const controlsDiv = DOM.create('div', {
+            className: 'timer-controls'
+        });
+        
+        // Move existing buttons to the controls container
+        const buttons = [
+            this.elements.startBtn,
+            this.elements.resetBtn,
+            this.elements.backBtn,
+            this.elements.skipBtn,
+            this.elements.fullscreenBtn
+        ].filter(btn => btn);
+        
+        buttons.forEach(btn => {
+            if (btn && btn.parentNode) {
+                controlsDiv.appendChild(btn.cloneNode(true));
+            }
+        });
+        
+        return controlsDiv;
+    }
+
+    updateFullscreenButton(isFullscreen) {
+        console.log('updateFullscreenButton called with:', isFullscreen);
+        if (!this.elements.fullscreenBtn) {
+            console.warn('No fullscreen button to update');
+            return;
+        }
+        
+        const icon = this.elements.fullscreenBtn.querySelector('.fullscreen-icon');
+        const text = this.elements.fullscreenBtn.querySelector('.fullscreen-text');
+        
+        console.log('Fullscreen button elements - icon:', !!icon, 'text:', !!text);
+        
+        if (isFullscreen) {
+            this.elements.fullscreenBtn.setAttribute('aria-label', 'Exit fullscreen');
+            if (icon) icon.textContent = '⏹️'; // Exit fullscreen icon (changed from ⏸️)
+            if (text) text.textContent = 'Exit Fullscreen';
+            DOM.addClass(this.elements.fullscreenBtn, 'btn--active');
+        } else {
+            this.elements.fullscreenBtn.setAttribute('aria-label', 'Enter fullscreen');
+            if (icon) icon.textContent = '🔳'; // Fullscreen icon
+            if (text) text.textContent = 'Fullscreen';
+            DOM.removeClass(this.elements.fullscreenBtn, 'btn--active');
+        }
+        
+        console.log('Fullscreen button updated successfully');
+    }
+
+    async setupPWA() {
+        // Register service worker - disabled until sw.js is created
+        // if ('serviceWorker' in navigator) {
+        //     try {
+        //         await navigator.serviceWorker.register('/sw.js');
+        //         console.log('Service Worker registered');
+        //     } catch (error) {
+        //         console.warn('Service Worker registration failed:', error);
+        //     }
+        // }
 
         // Request wake lock for workout sessions
         if ('wakeLock' in navigator) {
@@ -1032,6 +1301,302 @@ class ModernBJJWorkoutApp extends EventEmitter {
         document.head.appendChild(style);
     }
 
+    ensureFullscreenStyles() {
+        if (document.querySelector('#fullscreen-styles')) return;
+        
+        const fullscreenCSS = `
+            /* Fullscreen Mode Styles */
+            .fullscreen-mode {
+                overflow: hidden;
+            }
+            
+            /* Accent button style for fullscreen button */
+            .btn--accent {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+                color: white !important;
+                border: 2px solid transparent !important;
+                transition: all 0.3s ease !important;
+            }
+            
+            .btn--accent:hover {
+                transform: translateY(-2px) !important;
+                box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4) !important;
+            }
+            
+            .btn--accent:active {
+                transform: translateY(0) !important;
+            }
+            
+            .timer-fullscreen {
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100vw !important;
+                height: 100vh !important;
+                background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%) !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: center !important;
+                align-items: center !important;
+                z-index: 999999 !important;
+                padding: 2rem !important;
+                box-sizing: border-box !important;
+            }
+            
+            .timer-fullscreen-simulated {
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100vw !important;
+                height: 100vh !important;
+                z-index: 999999 !important;
+            }
+            
+            .timer-fullscreen .timer-display {
+                font-size: min(20vw, 200px) !important;
+                text-align: center !important;
+                margin-bottom: 2rem !important;
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.3) !important;
+            }
+            
+            .timer-fullscreen .timer-display .minutes,
+            .timer-fullscreen .timer-display .seconds {
+                font-size: inherit !important;
+                font-weight: 700 !important;
+                color: #ffffff !important;
+                text-shadow: 0 0 30px rgba(255, 255, 255, 0.5) !important;
+            }
+            
+            .timer-fullscreen .timer-display .separator {
+                font-size: inherit !important;
+                color: #ffffff !important;
+                opacity: 0.8 !important;
+                animation: blink 1s infinite !important;
+            }
+            
+            .timer-fullscreen .timer-label {
+                font-size: min(5vw, 48px) !important;
+                color: #ffffff !important;
+                text-align: center !important;
+                margin-bottom: 1rem !important;
+                font-weight: 600 !important;
+                text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3) !important;
+            }
+            
+            .timer-fullscreen .phase-info {
+                font-size: min(3vw, 24px) !important;
+                color: rgba(255, 255, 255, 0.8) !important;
+                text-align: center !important;
+                margin-bottom: 3rem !important;
+                font-weight: 400 !important;
+            }
+            
+            .timer-fullscreen .progress-container {
+                width: 80% !important;
+                max-width: 600px !important;
+                margin: 2rem auto !important;
+            }
+            
+            .timer-fullscreen .progress-bar {
+                height: 8px !important;
+                background: rgba(255, 255, 255, 0.2) !important;
+                border-radius: 4px !important;
+                overflow: hidden !important;
+            }
+            
+            .timer-fullscreen .progress-fill {
+                height: 100% !important;
+                background: linear-gradient(90deg, #4CAF50, #8BC34A) !important;
+                border-radius: 4px !important;
+                transition: width 0.3s ease !important;
+                box-shadow: 0 0 10px rgba(76, 175, 80, 0.4) !important;
+            }
+            
+            .timer-fullscreen .progress-text {
+                color: rgba(255, 255, 255, 0.7) !important;
+                font-size: min(2.5vw, 18px) !important;
+                text-align: center !important;
+                margin-top: 1rem !important;
+            }
+            
+            .timer-fullscreen .timer-controls {
+                position: absolute !important;
+                bottom: 2rem !important;
+                left: 50% !important;
+                transform: translateX(-50%) !important;
+                display: flex !important;
+                gap: 1rem !important;
+                flex-wrap: wrap !important;
+                justify-content: center !important;
+            }
+            
+            .timer-fullscreen .btn {
+                padding: 0.75rem 1.5rem !important;
+                font-size: min(2.5vw, 16px) !important;
+                border-radius: 8px !important;
+                border: 2px solid rgba(255, 255, 255, 0.3) !important;
+                background: rgba(255, 255, 255, 0.1) !important;
+                color: #ffffff !important;
+                backdrop-filter: blur(10px) !important;
+                transition: all 0.3s ease !important;
+                cursor: pointer !important;
+            }
+            
+            .timer-fullscreen .btn:hover {
+                background: rgba(255, 255, 255, 0.2) !important;
+                border-color: rgba(255, 255, 255, 0.5) !important;
+                transform: translateY(-2px) !important;
+            }
+            
+            .timer-fullscreen .btn:active {
+                transform: translateY(0) !important;
+            }
+            
+            .timer-fullscreen .btn--primary {
+                background: rgba(33, 150, 243, 0.3) !important;
+                border-color: rgba(33, 150, 243, 0.5) !important;
+            }
+            
+            .timer-fullscreen .btn--success {
+                background: rgba(76, 175, 80, 0.3) !important;
+                border-color: rgba(76, 175, 80, 0.5) !important;
+            }
+            
+            .timer-fullscreen .btn--active {
+                background: rgba(255, 255, 255, 0.3) !important;
+                border-color: rgba(255, 255, 255, 0.7) !important;
+            }
+            
+            /* Fullscreen button styles */
+            .fullscreen-btn {
+                position: relative !important;
+                overflow: hidden !important;
+            }
+            
+            .fullscreen-btn .fullscreen-icon {
+                margin-right: 0.5rem !important;
+            }
+            
+            @keyframes blink {
+                0%, 50% { opacity: 1; }
+                51%, 100% { opacity: 0.3; }
+            }
+            
+            /* Hide non-essential elements in fullscreen */
+            .fullscreen-mode .day-selection,
+            .fullscreen-mode .workout-details,
+            .fullscreen-mode .exercise-grid,
+            .fullscreen-mode .settings-panel,
+            .fullscreen-mode .app-header,
+            .fullscreen-mode .app-footer {
+                display: none !important;
+            }
+            
+            /* Responsive adjustments for fullscreen */
+            @media (max-width: 768px) {
+                .timer-fullscreen {
+                    padding: 1rem !important;
+                }
+                
+                .timer-fullscreen .timer-display {
+                    font-size: min(25vw, 150px) !important;
+                    margin-bottom: 1rem !important;
+                }
+                
+                .timer-fullscreen .timer-label {
+                    font-size: min(6vw, 32px) !important;
+                }
+                
+                .timer-fullscreen .phase-info {
+                    font-size: min(4vw, 18px) !important;
+                    margin-bottom: 2rem !important;
+                }
+                
+                .timer-fullscreen .timer-controls {
+                    bottom: 1rem !important;
+                    gap: 0.5rem !important;
+                }
+                
+                .timer-fullscreen .btn {
+                    padding: 0.5rem 1rem !important;
+                    font-size: min(3vw, 14px) !important;
+                }
+            }
+            
+            @media (max-width: 480px) {
+                .timer-fullscreen .timer-display {
+                    font-size: min(30vw, 120px) !important;
+                }
+                
+                .timer-fullscreen .timer-controls {
+                    flex-direction: column !important;
+                    width: 100% !important;
+                    max-width: 300px !important;
+                }
+                
+                .timer-fullscreen .btn {
+                    width: 100% !important;
+                    text-align: center !important;
+                }
+            }
+        `;
+        
+        const style = DOM.create('style', { id: 'fullscreen-styles', textContent: fullscreenCSS });
+        document.head.appendChild(style);
+    }
+
+    ensureFullscreenFunctionality() {
+        console.log('=== ENSURING FULLSCREEN FUNCTIONALITY ===');
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+        console.log('Fullscreen button found:', !!fullscreenBtn);
+        
+        if (fullscreenBtn) {
+            // Remove any existing event listeners and add fresh ones
+            const newBtn = fullscreenBtn.cloneNode(true);
+            fullscreenBtn.parentNode.replaceChild(newBtn, fullscreenBtn);
+            
+            // Add click handler
+            newBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('FULLSCREEN BUTTON CLICKED - BACKUP HANDLER');
+                
+                // Simple test - just toggle CSS classes
+                const timerContainer = document.getElementById('timer-container');
+                if (timerContainer) {
+                    if (timerContainer.classList.contains('timer-fullscreen')) {
+                        // Exit fullscreen
+                        console.log('Exiting fullscreen mode');
+                        document.body.classList.remove('fullscreen-mode');
+                        timerContainer.classList.remove('timer-fullscreen', 'timer-fullscreen-simulated');
+                        newBtn.querySelector('.fullscreen-text').textContent = 'Fullscreen';
+                        newBtn.querySelector('.fullscreen-icon').textContent = '🔳';
+                    } else {
+                        // Enter fullscreen
+                        console.log('Entering fullscreen mode');
+                        document.body.classList.add('fullscreen-mode');
+                        timerContainer.classList.add('timer-fullscreen', 'timer-fullscreen-simulated');
+                        newBtn.querySelector('.fullscreen-text').textContent = 'Exit Fullscreen';
+                        newBtn.querySelector('.fullscreen-icon').textContent = '⏹️';
+                    }
+                } else {
+                    console.error('Timer container not found');
+                }
+                
+                // Haptic feedback
+                if (navigator.vibrate) {
+                    navigator.vibrate(200);
+                }
+            });
+            
+            // Update the cached element
+            this.elements.fullscreenBtn = newBtn;
+            console.log('Fullscreen functionality ensured with backup handler');
+        } else {
+            console.error('Fullscreen button not found even with backup search');
+        }
+    }
+
     // Enhanced haptic feedback
     hapticFeedback(pattern = [200]) {
         if (this.state.settings.vibrationEnabled && navigator.vibrate) {
@@ -1176,7 +1741,17 @@ class ModernBJJWorkoutApp extends EventEmitter {
                 }
                 break;
             case 'Escape':
-                this.closeModal();
+                if (this.isFullscreen()) {
+                    this.exitFullscreen();
+                } else {
+                    this.closeModal();
+                }
+                break;
+            case 'f':
+                if (e.ctrlKey || e.metaKey) {
+                    e.preventDefault();
+                    this.toggleFullscreen();
+                }
                 break;
         }
     }
@@ -1279,12 +1854,9 @@ class ModernBJJWorkoutApp extends EventEmitter {
 
     // Enhanced notification system
     notify() {
-        // Sound notification
-        if (this.state.settings.soundEnabled && this.elements.notificationSound) {
-            this.elements.notificationSound.currentTime = 0;
-            this.elements.notificationSound.play().catch(e => 
-                console.warn('Audio play failed:', e)
-            );
+        // Sound notification using Web Audio API
+        if (this.state.settings.soundEnabled) {
+            this.playNotificationBeep();
         }
         
         // Haptic feedback
@@ -1292,6 +1864,33 @@ class ModernBJJWorkoutApp extends EventEmitter {
         
         // Visual feedback
         animationManager.bounceElement(this.elements.timerDisplay);
+    }
+
+    playNotificationBeep() {
+        try {
+            // Create a simple beep using Web Audio API
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.setValueAtTime(800, audioContext.currentTime); // 800 Hz tone
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.3);
+        } catch (error) {
+            console.warn('Web Audio API beep failed, trying fallback:', error);
+            // Fallback: try to play the audio element if it exists
+            if (this.elements.notificationSound) {
+                this.elements.notificationSound.play().catch(e => 
+                    console.warn('Audio element fallback also failed:', e)
+                );
+            }
+        }
     }
 
     // Cleanup method
@@ -1313,6 +1912,10 @@ class ModernBJJWorkoutApp extends EventEmitter {
         window.removeEventListener('resize', this.handleResize);
         document.removeEventListener('visibilitychange', this.handleVisibilityChange);
         document.removeEventListener('keydown', this.handleKeydown);
+        document.removeEventListener('fullscreenchange', this.handleFullscreenChange);
+        document.removeEventListener('webkitfullscreenchange', this.handleFullscreenChange);
+        document.removeEventListener('mozfullscreenchange', this.handleFullscreenChange);
+        document.removeEventListener('MSFullscreenChange', this.handleFullscreenChange);
         
         // Cleanup animations
         animationManager.cleanup();
