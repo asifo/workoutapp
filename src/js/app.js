@@ -1333,7 +1333,7 @@ class ModernBJJWorkoutApp extends EventEmitter {
                 left: 0 !important;
                 width: 100vw !important;
                 height: 100vh !important;
-                background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%) !important;
+                background: linear-gradient(135deg, #0a0a1a 0%, #0d1424 50%, #0a2040 100%) !important;
                 display: flex !important;
                 flex-direction: column !important;
                 justify-content: center !important;
@@ -1356,21 +1356,34 @@ class ModernBJJWorkoutApp extends EventEmitter {
                 font-size: min(20vw, 200px) !important;
                 text-align: center !important;
                 margin-bottom: 2rem !important;
-                text-shadow: 0 0 20px rgba(255, 255, 255, 0.3) !important;
+                color: #ffffff !important;
+                text-shadow: 
+                    0 0 20px rgba(255, 255, 255, 0.8),
+                    0 0 40px rgba(255, 255, 255, 0.6),
+                    0 4px 8px rgba(0, 0, 0, 0.3) !important;
             }
             
             .timer-fullscreen .timer-display .minutes,
             .timer-fullscreen .timer-display .seconds {
                 font-size: inherit !important;
-                font-weight: 700 !important;
+                font-weight: 900 !important;
                 color: #ffffff !important;
-                text-shadow: 0 0 30px rgba(255, 255, 255, 0.5) !important;
+                text-shadow: 
+                    0 0 30px rgba(255, 255, 255, 0.9),
+                    0 0 60px rgba(255, 255, 255, 0.7),
+                    0 4px 12px rgba(0, 0, 0, 0.4) !important;
+                text-rendering: optimizeLegibility !important;
+                -webkit-font-smoothing: antialiased !important;
             }
             
             .timer-fullscreen .timer-display .separator {
                 font-size: inherit !important;
                 color: #ffffff !important;
-                opacity: 0.8 !important;
+                opacity: 1 !important;
+                font-weight: 900 !important;
+                text-shadow: 
+                    0 0 30px rgba(255, 255, 255, 0.9),
+                    0 0 60px rgba(255, 255, 255, 0.7) !important;
                 animation: blink 1s infinite !important;
             }
             
@@ -1501,6 +1514,20 @@ class ModernBJJWorkoutApp extends EventEmitter {
                 .timer-fullscreen .timer-display {
                     font-size: min(25vw, 150px) !important;
                     margin-bottom: 1rem !important;
+                    color: #ffffff !important;
+                    text-shadow: 
+                        0 0 15px rgba(255, 255, 255, 0.9),
+                        0 0 30px rgba(255, 255, 255, 0.7) !important;
+                }
+                
+                .timer-fullscreen .timer-display .minutes,
+                .timer-fullscreen .timer-display .seconds,
+                .timer-fullscreen .timer-display .separator {
+                    color: #ffffff !important;
+                    font-weight: 900 !important;
+                    text-shadow: 
+                        0 0 20px rgba(255, 255, 255, 0.9),
+                        0 0 40px rgba(255, 255, 255, 0.7) !important;
                 }
                 
                 .timer-fullscreen .timer-label {
@@ -1526,6 +1553,20 @@ class ModernBJJWorkoutApp extends EventEmitter {
             @media (max-width: 480px) {
                 .timer-fullscreen .timer-display {
                     font-size: min(30vw, 120px) !important;
+                    color: #ffffff !important;
+                    text-shadow: 
+                        0 0 12px rgba(255, 255, 255, 0.9),
+                        0 0 25px rgba(255, 255, 255, 0.8) !important;
+                }
+                
+                .timer-fullscreen .timer-display .minutes,
+                .timer-fullscreen .timer-display .seconds,
+                .timer-fullscreen .timer-display .separator {
+                    color: #ffffff !important;
+                    font-weight: 900 !important;
+                    text-shadow: 
+                        0 0 15px rgba(255, 255, 255, 0.9),
+                        0 0 30px rgba(255, 255, 255, 0.8) !important;
                 }
                 
                 .timer-fullscreen .timer-controls {
