@@ -198,6 +198,26 @@ Exercise Item (.exercise-item):
 - Background: --color-primary-50 (consistent theme color)
 - Border: 1px solid --color-primary-200
 - Border Radius: --radius-lg
+
+Exercise Info Container (.exercise-info):
+- Layout: flexbox column with gap --space-1
+- Flex: 1 (takes available space)
+- Contains exercise name and description
+
+Exercise Name:
+- Font: --text-sm, medium weight, BJJ blue (#1e3c72)
+- Color: --color-primary-700
+- Layout: flex item
+
+Exercise Description (.exercise-description):
+- Font: --text-sm, bold weight, pure black (#000000)
+- Background: transparent (matches container background)
+- Padding: --space-3 --space-4 (generous spacing for readability)
+- Border-left: 4px solid --color-primary-500 (visual accent)
+- Border-radius: --radius-lg
+- Line-height: 1.6 (improved readability)
+- Margin-top: --space-2 (separation from exercise name)
+- Contains detailed exercise sequences (e.g., "1. 5 One-arm swings → 2. 5 Cleans → 3. 5 Overhead presses → 4. 5 Front squats")
 - Padding: --space-3 --space-4
 - Hover: background --color-primary-100, translateX(4px)
 
@@ -273,10 +293,12 @@ Content Animation: translateY with opacity transition
 
 ### 1. Accessibility First
 - High contrast ratios (minimum 4.5:1 for normal text)
+- **Maximum contrast for critical information**: Pure black (#000000) text for exercise descriptions
 - Focus indicators with 2px solid outline
 - ARIA labels and semantic HTML
 - Screen reader support
 - Keyboard navigation
+- **Transparent backgrounds** for text elements to ensure consistent contrast
 
 ### 2. Mobile-First Responsive
 - Breakpoints: sm(640px), md(768px), lg(1024px), xl(1280px)
@@ -353,6 +375,9 @@ src/
 ### Before Committing Changes
 - [ ] Colors match the brand palette
 - [ ] Text has sufficient contrast (use browser dev tools)
+- [ ] **Exercise descriptions are clearly visible** with maximum contrast
+- [ ] **Critical text uses pure black (#000000)** for optimal readability
+- [ ] **Background colors don't interfere** with text visibility
 - [ ] Components work on mobile and desktop
 - [ ] Hover states are implemented
 - [ ] Focus indicators are visible
@@ -376,6 +401,11 @@ src/
 - Custom color themes for different training phases
 - Enhanced animations and micro-interactions
 - Progressive Web App (PWA) optimizations
+
+### Recent Updates
+- **Exercise Description Visibility Fix**: Changed from colored backgrounds to transparent backgrounds with pure black text (#000000) for maximum contrast and readability
+- **Improved Exercise Information Layout**: Added `.exercise-info` container with flexbox column layout for better organization of exercise names and descriptions
+- **Enhanced Typography for Critical Information**: Used bold font weight and increased line-height (1.6) for exercise descriptions to ensure optimal readability during workouts
 
 ### Maintenance Notes
 - Review and update design tokens quarterly

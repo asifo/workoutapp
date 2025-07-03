@@ -758,7 +758,10 @@ class ModernBJJWorkoutApp extends EventEmitter {
                                 ${phase.exercises.map((exercise, idx) => `
                                     <li class="exercise-item">
                                         <span class="exercise-number">${idx + 1}</span>
-                                        <span class="exercise-name">${exercise.name}</span>
+                                        <div class="exercise-info">
+                                            <span class="exercise-name">${exercise.name}</span>
+                                            ${exercise.description ? `<span class="exercise-description">${exercise.description}</span>` : ''}
+                                        </div>
                                         <span class="exercise-duration">${exercise.duration}s</span>
                                     </li>
                                 `).join('')}
@@ -2333,24 +2336,24 @@ class ModernBJJWorkoutApp extends EventEmitter {
                         duration: 15,
                         exercises: [
                             // Round 1
-                            { name: "Right Arm Complex", duration: 45, description: "5 swings, 5 cleans, 5 presses, 5 squats" },
-                            { name: "Left Arm Complex", duration: 45, description: "5 swings, 5 cleans, 5 presses, 5 squats" },
+                            { name: "Right Arm Complex", duration: 45, description: "1. 5 One-arm swings → 2. 5 Cleans → 3. 5 Overhead presses → 4. 5 Front squats" },
+                            { name: "Left Arm Complex", duration: 45, description: "1. 5 One-arm swings → 2. 5 Cleans → 3. 5 Overhead presses → 4. 5 Front squats" },
                             { name: "Rest", duration: 90, description: "Recovery between rounds" },
                             // Round 2
-                            { name: "Right Arm Complex", duration: 45, description: "5 swings, 5 cleans, 5 presses, 5 squats" },
-                            { name: "Left Arm Complex", duration: 45, description: "5 swings, 5 cleans, 5 presses, 5 squats" },
+                            { name: "Right Arm Complex", duration: 45, description: "1. 5 One-arm swings → 2. 5 Cleans → 3. 5 Overhead presses → 4. 5 Front squats" },
+                            { name: "Left Arm Complex", duration: 45, description: "1. 5 One-arm swings → 2. 5 Cleans → 3. 5 Overhead presses → 4. 5 Front squats" },
                             { name: "Rest", duration: 90, description: "Recovery between rounds" },
                             // Round 3
-                            { name: "Right Arm Complex", duration: 45, description: "5 swings, 5 cleans, 5 presses, 5 squats" },
-                            { name: "Left Arm Complex", duration: 45, description: "5 swings, 5 cleans, 5 presses, 5 squats" },
+                            { name: "Right Arm Complex", duration: 45, description: "1. 5 One-arm swings → 2. 5 Cleans → 3. 5 Overhead presses → 4. 5 Front squats" },
+                            { name: "Left Arm Complex", duration: 45, description: "1. 5 One-arm swings → 2. 5 Cleans → 3. 5 Overhead presses → 4. 5 Front squats" },
                             { name: "Rest", duration: 90, description: "Recovery between rounds" },
                             // Round 4
-                            { name: "Right Arm Complex", duration: 45, description: "5 swings, 5 cleans, 5 presses, 5 squats" },
-                            { name: "Left Arm Complex", duration: 45, description: "5 swings, 5 cleans, 5 presses, 5 squats" },
+                            { name: "Right Arm Complex", duration: 45, description: "1. 5 One-arm swings → 2. 5 Cleans → 3. 5 Overhead presses → 4. 5 Front squats" },
+                            { name: "Left Arm Complex", duration: 45, description: "1. 5 One-arm swings → 2. 5 Cleans → 3. 5 Overhead presses → 4. 5 Front squats" },
                             { name: "Rest", duration: 90, description: "Recovery between rounds" },
                             // Round 5
-                            { name: "Right Arm Complex", duration: 45, description: "5 swings, 5 cleans, 5 presses, 5 squats" },
-                            { name: "Left Arm Complex", duration: 45, description: "5 swings, 5 cleans, 5 presses, 5 squats" },
+                            { name: "Right Arm Complex", duration: 45, description: "1. 5 One-arm swings → 2. 5 Cleans → 3. 5 Overhead presses → 4. 5 Front squats" },
+                            { name: "Left Arm Complex", duration: 45, description: "1. 5 One-arm swings → 2. 5 Cleans → 3. 5 Overhead presses → 4. 5 Front squats" },
                             { name: "Rest", duration: 90, description: "Recovery between rounds" }
                         ]
                     },
@@ -2388,11 +2391,11 @@ class ModernBJJWorkoutApp extends EventEmitter {
                         name: "Sparring Rounds Circuit",
                         duration: 12,
                         exercises: [
-                            { name: "AMRAP Round 1", duration: 180, description: "3 minutes: 5 rows per side, 5 thrusters, 5 burpees, 10 swings" },
+                            { name: "AMRAP Round 1", duration: 180, description: "1. 5 One-arm KB Rows per side → 2. 5 KB Thrusters → 3. 5 Burpees/Sprawls → 4. 10 Two-Hand KB Swings" },
                             { name: "Rest", duration: 60, description: "1 minute recovery" },
-                            { name: "AMRAP Round 2", duration: 180, description: "3 minutes: 5 rows per side, 5 thrusters, 5 burpees, 10 swings" },
+                            { name: "AMRAP Round 2", duration: 180, description: "1. 5 One-arm KB Rows per side → 2. 5 KB Thrusters → 3. 5 Burpees/Sprawls → 4. 10 Two-Hand KB Swings" },
                             { name: "Rest", duration: 60, description: "1 minute recovery" },
-                            { name: "AMRAP Round 3", duration: 180, description: "3 minutes: 5 rows per side, 5 thrusters, 5 burpees, 10 swings" },
+                            { name: "AMRAP Round 3", duration: 180, description: "1. 5 One-arm KB Rows per side → 2. 5 KB Thrusters → 3. 5 Burpees/Sprawls → 4. 10 Two-Hand KB Swings" },
                             { name: "Rest", duration: 60, description: "1 minute recovery" }
                         ]
                     },
@@ -2548,11 +2551,55 @@ class ModernBJJWorkoutApp extends EventEmitter {
                 type: "Conditioning",
                 description: "Full-body exercise combining squat, plank, and jump",
                 cues: [
-                    "Start standing, drop to squat",
-                    "Jump feet back to plank",
-                    "Do push-up (optional)",
+                    "Start standing, drop into squat",
+                    "Jump feet back to plank position",
+                    "Complete push-up (optional)",
                     "Jump feet back to squat",
-                    "Jump up with arms overhead"
+                    "Explode up with arms overhead"
+                ]
+            },
+            "One-arm KB Row": {
+                type: "Strength",
+                description: "Unilateral rowing movement using kettlebell for back strength",
+                cues: [
+                    "Hinge at hips, one hand on bench for support",
+                    "Pull KB up to ribs, not chest",
+                    "Keep elbow close to body",
+                    "Squeeze shoulder blade at top",
+                    "Lower with control"
+                ]
+            },
+            "KB Thruster": {
+                type: "Power",
+                description: "Squat to overhead press combination movement",
+                cues: [
+                    "Start with KB in rack position",
+                    "Squat down keeping chest up",
+                    "Drive through heels to stand",
+                    "Use momentum to press KB overhead",
+                    "Return to rack position"
+                ]
+            },
+            "Front Squat": {
+                type: "Strength",
+                description: "Squat with kettlebell in front rack position",
+                cues: [
+                    "Hold KB in rack position at shoulder",
+                    "Keep elbow tight to body",
+                    "Squat down with chest up",
+                    "Drive through heels to stand",
+                    "Keep KB close to body throughout"
+                ]
+            },
+            "Sprawl": {
+                type: "Conditioning",
+                description: "BJJ-specific movement similar to burpee without jump",
+                cues: [
+                    "Start standing, drop to squat",
+                    "Jump feet back to plank position",
+                    "Hold plank briefly (combat position)",
+                    "Jump feet back to squat",
+                    "Return to standing (no jump)"
                 ]
             },
             "Kettlebell Row": {
