@@ -754,10 +754,15 @@ class ModernBJJWorkoutApp extends EventEmitter {
                         <p class="phase-duration">${phase.duration} minutes</p>
                         ${phase.repeat ? `<p class="phase-repeat">Repeat ${phase.repeat} times</p>` : ''}
                         <div class="phase-exercises">
-                            ${phase.exercises.slice(0, 3).map(exercise => `
-                                <span class="exercise-tag">${exercise.name}</span>
-                            `).join('')}
-                            ${phase.exercises.length > 3 ? `<span class="exercise-more">+${phase.exercises.length - 3} more</span>` : ''}
+                            <ol class="exercise-list">
+                                ${phase.exercises.map((exercise, idx) => `
+                                    <li class="exercise-item">
+                                        <span class="exercise-number">${idx + 1}</span>
+                                        <span class="exercise-name">${exercise.name}</span>
+                                        <span class="exercise-duration">${exercise.duration}s</span>
+                                    </li>
+                                `).join('')}
+                            </ol>
                         </div>
                     </div>
                 `).join('')}
@@ -783,7 +788,7 @@ class ModernBJJWorkoutApp extends EventEmitter {
                     <span class="exercise-type exercise-type--${exercise.type.toLowerCase()}">${exercise.type}</span>
                 </div>
                 <p class="exercise-description">${exercise.description}</p>
-                <button class="btn btn--secondary btn--sm" onclick="bjjApp.showExerciseModal('${name}')">
+                <button class="btn btn--exercise" onclick="bjjApp.showExerciseModal('${name}')">
                     View Details
                 </button>
             </div>
