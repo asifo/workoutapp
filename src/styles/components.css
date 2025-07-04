@@ -52,14 +52,15 @@
 
 /* Button Variants */
 .btn--primary {
-  background: linear-gradient(135deg, var(--color-primary-500), var(--color-secondary-500));
-  color: white;
+  background: linear-gradient(135deg, var(--color-secondary-400), var(--color-secondary-500));
+  color: var(--color-text-dark);
   box-shadow: var(--shadow-lg);
+  font-weight: var(--font-bold);
 }
 
 .btn--primary:hover {
-  background: linear-gradient(135deg, var(--color-primary-600), var(--color-secondary-600));
-  box-shadow: var(--shadow-xl);
+  background: linear-gradient(135deg, var(--color-secondary-500), var(--color-secondary-600));
+  box-shadow: var(--shadow-xl), var(--glow-yellow);
   transform: translateY(-2px);
 }
 
@@ -93,34 +94,34 @@
 }
 
 .btn--secondary {
-  background: linear-gradient(135deg, var(--color-gray-100), var(--color-gray-200));
-  color: var(--color-gray-800);
-  border: 2px solid var(--color-gray-300);
+  background: linear-gradient(135deg, var(--color-primary-500), var(--color-primary-600));
+  color: var(--color-text-primary);
+  border: 2px solid var(--color-primary-600);
   box-shadow: var(--shadow-md);
   font-weight: var(--font-semibold);
 }
 
 .btn--secondary:hover {
-  background: linear-gradient(135deg, var(--color-primary-100), var(--color-primary-200));
-  border-color: var(--color-primary-500);
-  color: var(--color-primary-700);
-  box-shadow: var(--shadow-lg);
+  background: linear-gradient(135deg, var(--color-primary-600), var(--color-primary-700));
+  border-color: var(--color-primary-700);
+  color: var(--color-text-primary);
+  box-shadow: var(--shadow-lg), var(--glow-red);
   transform: translateY(-2px);
 }
 
 .btn--secondary:disabled {
-  background: var(--color-gray-100);
+  background: var(--color-gray-600);
   color: var(--color-gray-400);
-  border-color: var(--color-gray-200);
+  border-color: var(--color-gray-500);
   box-shadow: var(--shadow-sm);
   transform: none;
   cursor: not-allowed;
 }
 
 .btn--secondary:disabled:hover {
-  background: var(--color-gray-100);
+  background: var(--color-gray-600);
   color: var(--color-gray-400);
-  border-color: var(--color-gray-200);
+  border-color: var(--color-gray-500);
   box-shadow: var(--shadow-sm);
   transform: none;
 }
@@ -150,15 +151,15 @@
 
 /* Card Component */
 .card {
-  background: white;
+  background: var(--color-bg-card);
   border-radius: var(--radius-3xl);
   box-shadow: var(--shadow-xl);
   transition: all var(--transition-normal);
-  border: 1px solid var(--color-gray-100);
+  border: 2px solid var(--color-gray-700);
 }
 
 .card:hover {
-  box-shadow: var(--shadow-2xl);
+  box-shadow: var(--shadow-2xl), var(--glow-white);
   transform: translateY(-4px);
 }
 
@@ -167,7 +168,7 @@
 }
 
 .card--interactive:hover {
-  border-color: var(--color-primary-300);
+  border-color: var(--color-primary-500);
 }
 
 .card--interactive:active {
@@ -259,8 +260,8 @@
 .day-btn {
   position: relative;
   transition: all var(--transition-normal);
-  border: 2px solid var(--color-gray-200);
-  background: white;
+  border: 2px solid var(--color-gray-700);
+  background: var(--color-bg-card);
   border-radius: var(--radius-2xl);
   padding: var(--space-5);
   cursor: pointer;
@@ -270,38 +271,39 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  color: var(--color-text-dark);
 }
 
 .day-btn:hover {
   border-color: var(--color-primary-500);
   background: var(--color-primary-50);
   transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-lg), var(--glow-white);
 }
 
 .day-btn--active {
   border-color: var(--color-primary-500);
   background: linear-gradient(135deg, var(--color-primary-500), var(--color-secondary-500));
-  color: white;
-  box-shadow: var(--shadow-lg);
+  color: var(--color-text-primary);
+  box-shadow: var(--shadow-lg), var(--glow-red);
 }
 
 .day-btn--active:hover {
   background: linear-gradient(135deg, var(--color-primary-600), var(--color-secondary-600));
-  box-shadow: var(--shadow-xl);
+  box-shadow: var(--shadow-xl), var(--glow-red);
 }
 
 /* Exercise Cards */
 .exercise-card {
-  background: white;
+  background: var(--color-bg-card);
   border-radius: var(--radius-2xl);
   padding: var(--space-5);
   cursor: pointer;
   transition: all var(--transition-normal);
-  border: 2px solid var(--color-gray-200);
+  border: 2px solid var(--color-gray-700);
   position: relative;
   overflow: hidden;
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-xl);
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
@@ -317,7 +319,7 @@
 .exercise-card .exercise-name {
   font-size: var(--text-lg);
   font-weight: var(--font-semibold);
-  color: #1e3c72;
+  color: var(--color-text-dark);
   margin: 0;
   line-height: 1.3;
 }
@@ -333,23 +335,23 @@
 }
 
 .exercise-type--strength {
-  background: #fef2f2;
-  color: #b91c1c;
+  background: var(--color-primary-500);
+  color: var(--color-text-primary);
 }
 
 .exercise-type--cardio {
-  background: #f0fdf4;
-  color: #15803d;
+  background: var(--color-secondary-400);
+  color: var(--color-text-dark);
 }
 
 .exercise-type--mobility {
-  background: #eff6ff;
-  color: #1d4ed8;
+  background: var(--color-text-dark);
+  color: var(--color-text-primary);
 }
 
 .exercise-card .exercise-description {
   font-size: var(--text-sm);
-  color: #374151;
+  color: var(--color-gray-600);
   line-height: 1.5;
   margin: 0;
   flex-grow: 1;
@@ -364,8 +366,8 @@
 
 .btn--exercise {
   background: transparent;
-  color: #1e40af;
-  border: 1px solid #93c5fd;
+  color: var(--color-secondary-500);
+  border: 1px solid var(--color-secondary-500);
   font-weight: var(--font-medium);
   font-size: var(--text-sm);
   padding: var(--space-2) var(--space-3);
@@ -378,22 +380,22 @@
 }
 
 .btn--exercise:hover {
-  background: #eff6ff;
-  border-color: #3b82f6;
-  color: #1e40af;
+  background: var(--color-secondary-400);
+  border-color: var(--color-secondary-400);
+  color: var(--color-text-dark);
   transform: none;
-  box-shadow: none;
+  box-shadow: var(--glow-yellow);
 }
 
 .btn--exercise:active {
-  background: #dbeafe;
+  background: var(--color-secondary-500);
   transform: scale(0.98);
 }
 
 .exercise-card:hover {
-  border-color: var(--color-primary-400);
+  border-color: var(--color-primary-500);
   transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-xl), var(--glow-white);
 }
 
 /* Modal */
@@ -417,7 +419,8 @@
 }
 
 .modal__content {
-  background: white;
+  background: var(--color-bg-card);
+  border: 2px solid var(--color-gray-700);
   border-radius: var(--radius-3xl);
   max-width: 90vw;
   max-height: 90vh;
@@ -443,8 +446,8 @@
   width: 60px;
   height: 60px;
   border-radius: var(--radius-full);
-  background: white;
-  border: none;
+  background: var(--color-bg-card);
+  border: 2px solid var(--color-gray-700);
   box-shadow: var(--shadow-lg);
   cursor: pointer;
   display: flex;
@@ -456,14 +459,15 @@
 }
 
 .settings-toggle:hover {
-  background: var(--color-primary-50);
-  color: var(--color-primary-600);
+  background: var(--color-primary-500);
+  color: var(--color-text-primary);
   transform: rotate(45deg);
+  box-shadow: var(--shadow-xl), var(--glow-red);
 }
 
 .settings-toggle--active {
   background: var(--color-primary-500);
-  color: white;
+  color: var(--color-text-primary);
 }
 
 .settings-content {
@@ -471,8 +475,8 @@
   bottom: 80px;
   right: 0;
   width: 300px;
-  background: white;
-  border: 1px solid var(--color-gray-200);
+  background: var(--color-bg-card);
+  border: 2px solid var(--color-gray-700);
   border-radius: var(--radius-2xl);
   box-shadow: var(--shadow-xl);
   padding: var(--space-6);
@@ -506,7 +510,7 @@
 .workout-focus {
   font-size: var(--text-lg);
   font-weight: var(--font-medium);
-  color: var(--color-gray-700);
+  color: var(--color-text-primary);
   margin: 0 0 var(--space-1) 0;
   line-height: 1.3;
 }
@@ -514,7 +518,7 @@
 .workout-duration {
   font-size: var(--text-base);
   font-weight: var(--font-medium);
-  color: var(--color-gray-600);
+  color: var(--color-text-secondary);
   margin: 0;
   display: inline-flex;
   align-items: center;
@@ -535,26 +539,26 @@
 }
 
 .phase-card {
-  background: white;
-  border: 2px solid var(--color-gray-200);
+  background: var(--color-bg-card);
+  border: 2px solid var(--color-gray-700);
   border-radius: var(--radius-2xl);
   padding: var(--space-5);
   transition: all var(--transition-normal);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-xl);
   position: relative;
   overflow: hidden;
 }
 
 .phase-card:hover {
-  border-color: var(--color-primary-300);
+  border-color: var(--color-primary-500);
   transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-2xl), var(--glow-white);
 }
 
 .phase-card--optional {
   border-style: dashed;
-  border-color: var(--color-warning-500);
-  background: var(--color-warning-50);
+  border-color: var(--color-secondary-400);
+  background: var(--color-secondary-50);
   position: relative;
 }
 
@@ -596,12 +600,12 @@
 .phase-repeat {
   font-size: var(--text-sm);
   font-weight: var(--font-medium);
-  color: var(--color-info-600);
+  color: var(--color-secondary-600);
   margin: 0 0 var(--space-4) 0;
   padding: var(--space-2) var(--space-3);
-  background: var(--color-info-50);
+  background: var(--color-secondary-50);
   border-radius: var(--radius-lg);
-  border: 1px solid var(--color-info-200);
+  border: 1px solid var(--color-secondary-200);
   display: inline-block;
 }
 
@@ -630,25 +634,26 @@
   align-items: center;
   gap: var(--space-3);
   padding: var(--space-3) var(--space-4);
-  background: var(--color-primary-50);
+  background: var(--color-gray-50);
   border-radius: var(--radius-lg);
-  border: 1px solid var(--color-primary-200);
+  border: 1px solid var(--color-gray-200);
   transition: all var(--transition-fast);
 }
 
 .exercise-item:hover {
-  background: var(--color-primary-100);
-  border-color: var(--color-primary-300);
+  background: var(--color-primary-500);
+  border-color: var(--color-primary-500);
+  color: var(--color-text-primary);
   transform: translateX(4px);
 }
 
 .exercise-number {
   font-size: var(--text-sm);
   font-weight: var(--font-bold);
-  color: var(--color-primary-600);
+  color: var(--color-secondary-500);
   min-width: 24px;
   text-align: center;
-  background: var(--color-primary-100);
+  background: var(--color-text-dark);
   border-radius: var(--radius-full);
   width: 24px;
   height: 24px;
@@ -661,7 +666,7 @@
 .exercise-name {
   font-size: var(--text-sm);
   font-weight: var(--font-medium);
-  color: var(--color-primary-700);
+  color: var(--color-text-dark);
   flex: 1;
 }
 
@@ -684,7 +689,7 @@
 
 .exercise-description {
   font-size: var(--text-sm);
-  color: #000000;
+  color: var(--color-text-dark);
   line-height: 1.6;
   font-weight: var(--font-bold);
   background: transparent;
@@ -704,7 +709,7 @@
 
 .form-control label {
   font-weight: var(--font-medium);
-  color: var(--color-gray-800);
+  color: var(--color-text-dark);
   cursor: pointer;
 }
 
@@ -815,12 +820,13 @@
 /* High contrast mode support */
 @media (prefers-contrast: high) {
   .btn--primary {
-    background: var(--color-primary-700);
-    border: 2px solid var(--color-primary-800);
+    background: var(--color-secondary-500);
+    border: 2px solid var(--color-secondary-600);
+    color: var(--color-text-dark);
   }
   
   .card {
-    border: 2px solid var(--color-gray-300);
+    border: 3px solid var(--color-gray-700);
   }
   
   .day-btn {

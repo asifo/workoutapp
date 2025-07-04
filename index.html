@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Modern BJJ Kettlebell Conditioning App - 30-minute daily routines for elite BJJ performance">
-    <meta name="theme-color" content="#1e3c72">
+    <meta name="theme-color" content="#1a1a1a">
     <title>BJJ Kettlebell Conditioning - Modern Training App</title>
     
     <!-- Preconnect to external resources -->
@@ -37,8 +37,10 @@
                         'inter': ['Inter', 'sans-serif'],
                     },
                     colors: {
-                        'bjj-blue': '#1e3c72',
-                        'bjj-light-blue': '#2a5298',
+                        'bjj-black': '#1a1a1a',
+                        'bjj-red': '#dc2626',
+                        'bjj-yellow': '#fbbf24',
+                        'bjj-white': '#ffffff',
                     },
                     container: {
                         center: true,
@@ -49,9 +51,9 @@
         }
     </script>
 </head>
-<body class="font-inter bg-gradient-to-br from-bjj-blue to-bjj-light-blue min-h-screen text-gray-800 leading-relaxed">
+<body class="font-inter bg-bjj-black min-h-screen text-white leading-relaxed">
     <!-- Skip to content link for accessibility -->
-    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-white px-4 py-2 rounded-lg text-bjj-blue font-semibold z-50">
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-white px-4 py-2 rounded-lg text-bjj-red font-semibold z-50">
         Skip to main content
     </a>
 
@@ -83,7 +85,7 @@
         <main id="main-content" class="flex-1 flex flex-col gap-6" role="main">
             <!-- Workout Selection -->
             <section class="card p-6" aria-labelledby="workout-selection-title">
-                <h2 id="workout-selection-title" class="text-center mb-5 text-bjj-blue text-2xl font-semibold">
+                <h2 id="workout-selection-title" class="text-center mb-5 text-bjj-red text-2xl font-semibold">
                     Today's Workout
                 </h2>
                 <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4" role="group" aria-label="Workout day selection">
@@ -123,7 +125,7 @@
                 <h2 id="timer-section-title" class="sr-only">Workout Timer</h2>
                 
                 <div class="mb-6">
-                    <div class="timer-display text-6xl md:text-7xl font-bold text-bjj-blue font-mono mb-3 drop-shadow-md" 
+                    <div class="timer-display text-6xl md:text-7xl font-bold text-bjj-red font-mono mb-3 drop-shadow-md" 
                          id="time-display" 
                          role="timer" 
                          aria-live="polite" 
@@ -204,7 +206,7 @@
             <section class="card p-6" aria-labelledby="workout-details-title">
                 <div id="workout-details">
                     <div class="workout-overview">
-                        <h3 id="workout-details-title" class="text-bjj-blue mb-4 text-xl font-semibold">
+                        <h3 id="workout-details-title" class="text-bjj-red mb-4 text-xl font-semibold">
                             Workout Overview
                         </h3>
                         <p class="text-gray-600 leading-relaxed">
@@ -216,7 +218,7 @@
 
             <!-- Exercise Library -->
             <section class="card p-6" aria-labelledby="exercise-library-title">
-                <h3 id="exercise-library-title" class="text-bjj-blue mb-5 text-xl font-semibold">
+                <h3 id="exercise-library-title" class="text-bjj-red mb-5 text-xl font-semibold">
                     <i data-lucide="book-open" class="text-yellow-400 mr-3 inline-block w-6 h-6"></i>
                     Exercise Library
                 </h3>
@@ -240,7 +242,7 @@
             </button>
             
             <div class="settings-content" id="settings-content" role="dialog" aria-labelledby="settings-title">
-                <h3 id="settings-title" class="mb-4 text-bjj-blue font-semibold">Settings</h3>
+                <h3 id="settings-title" class="mb-4 text-bjj-red font-semibold">Settings</h3>
                 
                 <div class="form-control">
                     <label class="flex items-center gap-2 cursor-pointer font-medium text-gray-800">
@@ -337,8 +339,8 @@
     <div class="modal" id="exercise-modal" role="dialog" aria-labelledby="modal-title" aria-hidden="true">
         <div class="modal__content max-w-2xl w-11/12 max-h-[80vh] overflow-y-auto">
             <div class="flex justify-between items-center p-6 border-b border-gray-200 mb-5">
-                <h3 class="text-bjj-blue text-xl font-semibold" id="modal-title">Exercise Name</h3>
-                <button class="bg-none border-none text-3xl cursor-pointer text-gray-500 p-0 w-8 h-8 flex items-center justify-center hover:text-bjj-blue" 
+                <h3 class="text-bjj-red text-xl font-semibold" id="modal-title">Exercise Name</h3>
+                <button class="bg-none border-none text-3xl cursor-pointer text-gray-500 p-0 w-8 h-8 flex items-center justify-center hover:text-bjj-red" 
                         id="close-modal" 
                         aria-label="Close exercise details">
                     <i data-lucide="x" class="w-6 h-6"></i>
@@ -347,7 +349,7 @@
             <div class="px-6 pb-6">
                 <div class="mb-5">
                     <div class="bg-gray-100 rounded-xl p-10 text-center text-gray-600 border-2 border-dashed border-gray-300">
-                        <i data-lucide="play-circle" class="w-16 h-16 text-bjj-blue mb-3 mx-auto"></i>
+                        <i data-lucide="play-circle" class="w-16 h-16 text-bjj-red mb-3 mx-auto"></i>
                         <p>Video demonstration</p>
                     </div>
                 </div>
@@ -355,7 +357,7 @@
                     Exercise description will appear here.
                 </div>
                 <div class="exercise-cues">
-                    <h4 class="text-bjj-blue mb-3 font-semibold">Key Cues:</h4>
+                    <h4 class="text-bjj-red mb-3 font-semibold">Key Cues:</h4>
                     <ul class="list-none p-0" id="modal-cues" role="list">
                         <li class="py-2 border-b border-gray-200 text-gray-600">Loading...</li>
                     </ul>

@@ -1,46 +1,61 @@
 # BJJ Kettlebell Conditioning App - Style Guide
 
 ## Overview
-This style guide defines the design system, visual identity, and development standards for the BJJ Kettlebell Conditioning app. It ensures consistency across all components and features.
+This style guide defines the design system, visual identity, and development standards for the BJJ Kettlebell Conditioning app. It ensures consistency across all components and features with a **BJJ Blackbelt Theme** featuring predominantly black, red, white, and yellow colors.
 
 ---
 
 ## 🎨 Brand Colors
 
-### Primary Colors
-- **BJJ Blue**: `#1e3c72` - Main brand color, used for headers, primary buttons, and key text
-- **BJJ Light Blue**: `#2a5298` - Secondary brand color, used for gradients and accents
+### Primary Colors (BJJ Blackbelt Theme)
+- **BJJ Black**: `#1a1a1a` - Primary background color, representing the blackbelt
+- **BJJ Deep Black**: `#000000` - Headers, primary text, and deep backgrounds
+- **BJJ Red**: `#dc2626` - Accent color representing belt stripes and martial arts tradition
+- **BJJ Bright Red**: `#ef4444` - Interactive elements and highlights
+
+### Secondary Colors
+- **BJJ White**: `#ffffff` - Text on dark backgrounds, card backgrounds
+- **BJJ Off-White**: `#f8fafc` - Subtle backgrounds and borders
+- **BJJ Yellow**: `#fbbf24` - Button highlights and contrast elements
+- **BJJ Gold**: `#f59e0b` - Premium accents and success states
 
 ### Semantic Colors
 ```css
-/* Success (Green) */
---color-success-500: #10b981
---color-success-600: #059669
---color-success-700: #047857
+/* Success (Gold/Yellow) */
+--color-success-500: #f59e0b
+--color-success-600: #d97706
+--color-success-700: #b45309
 
-/* Error/Strength (Red) */
+/* Error/Danger (Red) */
 --color-error-500: #ef4444
 --color-error-600: #dc2626
-Strength Badge: #b91c1c on #fef2f2
+Strength Badge: #dc2626 on #fef2f2
 
-/* Cardio (Green) */
-Cardio Badge: #15803d on #f0fdf4
+/* Cardio (Yellow) */
+Cardio Badge: #f59e0b on #fffbeb
 
-/* Mobility (Blue) */
-Mobility Badge: #1d4ed8 on #eff6ff
+/* Mobility (Red) */
+Mobility Badge: #dc2626 on #fef2f2
+
+/* Warning (Yellow) */
+--color-warning-500: #fbbf24
+--color-warning-600: #f59e0b
 ```
 
 ### Neutral Colors
 ```css
 /* Text Colors */
-Primary Text: #374151 (dark gray)
-Secondary Text: #6b7280 (medium gray)
-Light Text: #9ca3af (light gray)
+Primary Text: #ffffff (white on dark backgrounds)
+Secondary Text: #d1d5db (light gray on dark backgrounds)
+Dark Text: #1a1a1a (black on light backgrounds)
+Light Text: #9ca3af (medium gray for subtle text)
 
 /* Background Colors */
-White: #ffffff
-Light Gray: #f9fafb
-Border Gray: #e5e7eb
+Primary Background: #1a1a1a (BJJ Black)
+Secondary Background: #000000 (Deep Black)
+Card Background: #ffffff (White cards on dark background)
+Border Color: #374151 (dark gray borders)
+Light Border: #e5e7eb (light borders on white cards)
 ```
 
 ---
@@ -74,10 +89,10 @@ Border Gray: #e5e7eb
 ```
 
 ### Typography Usage
-- **Headings**: BJJ Blue (`#1e3c72`) with semibold/bold weight
-- **Body Text**: Dark gray (`#374151`) with medium weight for readability
-- **Secondary Text**: Medium gray (`#6b7280`) with normal weight
-- **Interactive Text**: Blue theme colors for buttons and links
+- **Headings**: BJJ Red (`#dc2626`) with semibold/bold weight on dark backgrounds
+- **Body Text**: White (`#ffffff`) with medium weight on dark backgrounds
+- **Card Text**: Black (`#1a1a1a`) with medium weight on white card backgrounds
+- **Interactive Text**: Yellow (`#fbbf24`) for buttons and active states
 
 ---
 
@@ -85,103 +100,108 @@ Border Gray: #e5e7eb
 
 ### Cards
 ```css
-Background: white
-Border: 2px solid #e5e7eb
+Background: white (#ffffff)
+Border: 2px solid #374151 (dark gray)
 Border Radius: 1rem (--radius-2xl)
-Shadow: --shadow-md
+Shadow: enhanced shadows for contrast on dark background
 Padding: 1.25rem (--space-5)
-Hover: translateY(-2px) with --shadow-lg
+Hover: translateY(-2px) with red accent border (#dc2626)
 ```
 
 ### Buttons
 
-#### Primary Button
+#### Primary Button (Yellow Theme)
 ```css
-Background: linear-gradient(135deg, #1e3c72, #2a5298)
-Color: white
+Background: linear-gradient(135deg, #fbbf24, #f59e0b)
+Color: #1a1a1a (dark text for contrast)
 Border Radius: 1.5rem (--radius-2xl)
 Shadow: --shadow-lg
-Hover: translateY(-2px) with enhanced shadow
+Hover: translateY(-2px) with enhanced yellow gradient
+```
+
+#### Secondary Button (Red Theme)
+```css
+Background: linear-gradient(135deg, #dc2626, #ef4444)
+Color: #ffffff (white text)
+Border Radius: 1.5rem (--radius-2xl)
+Shadow: --shadow-lg
+Hover: translateY(-2px) with enhanced red gradient
 ```
 
 #### Exercise Card Button (.btn--exercise)
 ```css
 Background: transparent
-Color: #1e40af
-Border: 1px solid #93c5fd
-Border Radius: --radius-md (better text fit)
-Padding: --space-2 --space-3 (optimized for text)
+Color: #fbbf24 (yellow)
+Border: 1px solid #f59e0b (gold border)
+Border Radius: --radius-md
+Padding: --space-2 --space-3
 Display: inline-flex with center alignment
-White-space: nowrap (prevents text wrapping)
-Hover: background #eff6ff, border #3b82f6
-```
-
-#### Secondary Button
-```css
-Background: linear-gradient(135deg, #f3f4f6, #e5e7eb)
-Color: #1f2937
-Border: 2px solid #d1d5db
-Hover: BJJ blue theme colors
+White-space: nowrap
+Hover: background #1a1a1a, border #fbbf24
 ```
 
 ### Exercise Cards
 ```css
+Background: white (#ffffff)
 Layout: flexbox column with gap: --space-4
 Header: flex justify-between for name and type badge
-Name: --text-lg, semibold, BJJ blue (#1e3c72)
+Name: --text-lg, semibold, BJJ black (#1a1a1a)
 Description: --text-sm, medium weight, dark gray (#374151)
 Button: positioned at bottom with margin-top: auto
+Border: 2px solid #374151 with red hover accent
 ```
 
 ### Type Badges
 ```css
-Strength: #b91c1c on #fef2f2
-Cardio: #15803d on #f0fdf4  
-Mobility: #1d4ed8 on #eff6ff
+Strength: #ffffff on #dc2626 (white on red)
+Cardio: #1a1a1a on #fbbf24 (black on yellow)
+Mobility: #ffffff on #1a1a1a (white on black)
 Font: --text-xs, uppercase, letter-spacing: 0.5px
 ```
 
 ### Workout Details Section
 ```css
+Background: #1a1a1a (dark background)
 Layout: structured header with workout information
-Title: --text-2xl, bold, BJJ blue (#1e3c72)
-Focus: --text-lg, medium weight, dark gray (#374151)
-Duration: --text-base, medium weight, gray (#6b7280) with timer icon
-Header: border-bottom with --color-gray-100
+Title: --text-2xl, bold, BJJ red (#dc2626)
+Focus: --text-lg, medium weight, white (#ffffff)
+Duration: --text-base, medium weight, light gray (#d1d5db) with timer icon
+Header: border-bottom with dark gray (#374151)
 ```
 
 ### Phase Cards
 ```css
+Background: white (#ffffff)
 Layout: CSS grid with auto-fit columns (min 280px)
-Background: white with --shadow-md
-Border: 2px solid --color-gray-200
+Shadow: enhanced --shadow-xl for dark background contrast
+Border: 2px solid #374151 (dark border)
 Border Radius: --radius-2xl
 Padding: --space-5
-Hover: border-color --color-primary-300, translateY(-2px)
+Hover: border-color #dc2626 (red), translateY(-2px)
 ```
 
 #### Phase Card Variants
 ```css
 Optional Phase (.phase-card--optional):
-- Border: dashed style with --color-warning-500
-- Background: --color-warning-50
+- Border: dashed style with #fbbf24 (yellow)
+- Background: #fffbeb (light yellow)
 - Icon: 📋 positioned top-right
 ```
 
 ### Phase Elements
 ```css
 Phase Title:
-- Font: --text-xl, semibold, BJJ blue (#1e3c72)
+- Font: --text-xl, semibold, BJJ red (#dc2626)
 - Layout: flex with gap for potential icons
 
 Phase Duration:
-- Font: --text-base, medium weight, gray (#6b7280)
+- Font: --text-base, medium weight, dark gray (#374151)
 - Icon: ⏲️ prefix
 - Layout: inline-flex with gap
 
 Phase Repeat:
-- Font: --text-sm, medium weight, info blue (#2563eb)
-- Background: --color-info-50 with --color-info-200 border
+- Font: --text-sm, medium weight, yellow (#f59e0b)
+- Background: #fffbeb with #fbbf24 border
 - Icon: 🔄 prefix
 - Border Radius: --radius-lg
 ```
@@ -195,9 +215,10 @@ Exercise List (.exercise-list):
 
 Exercise Item (.exercise-item):
 - Layout: flexbox row with gap --space-3
-- Background: --color-primary-50 (consistent theme color)
-- Border: 1px solid --color-primary-200
+- Background: #f8fafc (light background on white cards)
+- Border: 1px solid #e5e7eb (light border)
 - Border Radius: --radius-lg
+- Hover: background #dc2626 (red), color #ffffff (white text)
 
 Exercise Info Container (.exercise-info):
 - Layout: flexbox column with gap --space-1
@@ -205,40 +226,32 @@ Exercise Info Container (.exercise-info):
 - Contains exercise name and description
 
 Exercise Name:
-- Font: --text-sm, medium weight, BJJ blue (#1e3c72)
-- Color: --color-primary-700
+- Font: --text-sm, medium weight, black (#1a1a1a)
 - Layout: flex item
+- Hover: color #ffffff (white on red background)
 
 Exercise Description (.exercise-description):
 - Font: --text-sm, bold weight, pure black (#000000)
-- Background: transparent (matches container background)
-- Padding: --space-3 --space-4 (generous spacing for readability)
-- Border-left: 4px solid --color-primary-500 (visual accent)
-- Border-radius: --radius-lg
-- Line-height: 1.6 (improved readability)
-- Margin-top: --space-2 (separation from exercise name)
-- Contains detailed exercise sequences (e.g., "1. 5 One-arm swings → 2. 5 Cleans → 3. 5 Overhead presses → 4. 5 Front squats")
+- Background: transparent
 - Padding: --space-3 --space-4
-- Hover: background --color-primary-100, translateX(4px)
+- Border-left: 4px solid #dc2626 (red accent)
+- Border-radius: --radius-lg
+- Line-height: 1.6
+- Margin-top: --space-2
+- Hover: color #ffffff (white text on red background)
 
 Exercise Number (.exercise-number):
 - Size: 24px circle
-- Background: --color-primary-100
-- Color: --color-primary-600
+- Background: #1a1a1a (black)
+- Color: #fbbf24 (yellow)
 - Font: --text-xs, bold
 - Layout: flexbox center alignment
 
-Exercise Name (.exercise-name):
-- Font: --text-sm, medium weight
-- Color: --color-primary-700 (theme integrated)
-- Flex: 1 (takes remaining space)
-- Clean text without separate background
-
 Exercise Duration (.exercise-duration):
 - Font: --text-xs, medium weight
-- Color: --color-gray-600
-- Background: --color-gray-100
-- Border: 1px solid --color-gray-300
+- Color: #374151 (dark gray)
+- Background: #f8fafc (light background)
+- Border: 1px solid #e5e7eb
 - Border Radius: --radius-md
 - Padding: --space-1 --space-2
 ```
@@ -246,16 +259,26 @@ Exercise Duration (.exercise-duration):
 ### Phase Exercise Container
 ```css
 Layout: sequential list display
-Top border: 1px solid --color-gray-200
+Top border: 1px solid #e5e7eb (light border on white cards)
 Spacing: margin-top and padding-top --space-4
 ```
 
 ### Settings Panel
 ```css
+Background: #1a1a1a (dark background)
 Toggle Button: 60px circle, white background, --shadow-lg
-Toggle Hover: rotate(45deg) with primary color theme
+Toggle Hover: background #dc2626 (red), color #ffffff (white)
 Content Panel: 300px width, positioned bottom-right
+Content Background: white (#ffffff)
+Content Border: 2px solid #374151 (dark border)
 Content Animation: translateY with opacity transition
+```
+
+### App Background
+```css
+Body Background: #1a1a1a (BJJ Black)
+Main Container: #1a1a1a with white cards floating on top
+Navigation: #000000 (deep black) with red and yellow accents
 ```
 
 ---
@@ -291,32 +314,38 @@ Content Animation: translateY with opacity transition
 
 ## 🎯 Design Principles
 
-### 1. Accessibility First
-- High contrast ratios (minimum 4.5:1 for normal text)
-- **Maximum contrast for critical information**: Pure black (#000000) text for exercise descriptions
-- Focus indicators with 2px solid outline
+### 1. BJJ Blackbelt Aesthetic
+- **Predominantly black backgrounds** representing the blackbelt
+- **Red accents** for belt stripes and martial arts tradition
+- **White cards** floating on dark backgrounds for content clarity
+- **Yellow highlights** for interactive elements and energy
+
+### 2. Accessibility First
+- High contrast ratios with white text on dark backgrounds
+- **Yellow buttons** provide excellent contrast against black backgrounds
+- **White cards** ensure readability for detailed content
+- Focus indicators with yellow (#fbbf24) for visibility on dark backgrounds
 - ARIA labels and semantic HTML
 - Screen reader support
 - Keyboard navigation
-- **Transparent backgrounds** for text elements to ensure consistent contrast
 
-### 2. Mobile-First Responsive
+### 3. Mobile-First Responsive
 - Breakpoints: sm(640px), md(768px), lg(1024px), xl(1280px)
 - Touch-friendly button sizes (minimum 44px height)
 - Responsive typography scaling
 - Flexible grid layouts
 
-### 3. Performance Optimization
+### 4. Performance Optimization
 - Minimal animation for reduced motion users
 - Efficient CSS with design tokens
 - Optimized font loading
 - Progressive enhancement
 
-### 4. Visual Hierarchy
-- BJJ blue for primary elements and headings
-- Consistent spacing using design tokens
-- Clear typography scale
-- Strategic use of shadows and elevation
+### 5. Visual Hierarchy
+- **Red for primary headings** and important elements
+- **Yellow for interactive elements** and calls-to-action
+- **White cards** for content sections
+- **Black backgrounds** for focus and elegance
 
 ---
 
@@ -327,6 +356,31 @@ Content Animation: translateY with opacity transition
 - **Components**: Modular styles in `components.css`
 - **Naming**: BEM-inspired with component-based naming
 - **Variables**: CSS custom properties for maintainability
+
+### Color Variables (Updated for Blackbelt Theme)
+```css
+:root {
+  /* Primary Colors */
+  --color-primary-500: #dc2626;    /* BJJ Red */
+  --color-primary-600: #b91c1c;    /* Darker Red */
+  --color-primary-700: #991b1b;    /* Deep Red */
+  
+  /* Secondary Colors */
+  --color-secondary-500: #fbbf24;  /* BJJ Yellow */
+  --color-secondary-600: #f59e0b;  /* Gold */
+  --color-secondary-700: #d97706;  /* Deep Gold */
+  
+  /* Background Colors */
+  --color-bg-primary: #1a1a1a;     /* BJJ Black */
+  --color-bg-secondary: #000000;   /* Deep Black */
+  --color-bg-card: #ffffff;        /* White Cards */
+  
+  /* Text Colors */
+  --color-text-primary: #ffffff;   /* White on dark */
+  --color-text-secondary: #d1d5db; /* Light gray */
+  --color-text-dark: #1a1a1a;      /* Black on light */
+}
+```
 
 ### JavaScript Integration
 - Event delegation for performance
@@ -353,7 +407,7 @@ src/
 ### Breakpoint Usage
 ```css
 /* Mobile First */
-.component { /* base mobile styles */ }
+.component { /* base mobile styles with dark theme */ }
 
 /* Tablet */
 @media (min-width: 768px) { /* md styles */ }
@@ -367,53 +421,57 @@ src/
 - **Buttons**: Full width on mobile, auto width on desktop
 - **Typography**: Slightly smaller on mobile
 - **Spacing**: Reduced padding/margins on mobile
+- **Dark theme**: Consistent across all breakpoints
 
 ---
 
 ## ✅ Quality Checklist
 
 ### Before Committing Changes
-- [ ] Colors match the brand palette
-- [ ] Text has sufficient contrast (use browser dev tools)
-- [ ] **Exercise descriptions are clearly visible** with maximum contrast
-- [ ] **Critical text uses pure black (#000000)** for optimal readability
-- [ ] **Background colors don't interfere** with text visibility
+- [ ] Colors match the BJJ blackbelt theme (black, red, white, yellow)
+- [ ] **White text has sufficient contrast** on dark backgrounds
+- [ ] **Yellow buttons are clearly visible** against black backgrounds
+- [ ] **White cards stand out** against dark backgrounds
+- [ ] **Red accents are used sparingly** for maximum impact
 - [ ] Components work on mobile and desktop
-- [ ] Hover states are implemented
-- [ ] Focus indicators are visible
+- [ ] Hover states use theme colors (red/yellow)
+- [ ] Focus indicators are visible (yellow on dark)
 - [ ] Animations respect reduced motion preferences
 - [ ] Code follows naming conventions
 - [ ] Design tokens are used instead of hardcoded values
 
 ### Testing Requirements
 - [ ] Test on Chrome, Firefox, and Safari
-- [ ] Test with keyboard navigation
+- [ ] Test with keyboard navigation (yellow focus indicators)
 - [ ] Test with screen reader (basic functionality)
 - [ ] Test on mobile device or responsive mode
-- [ ] Verify performance with browser dev tools
+- [ ] Verify dark theme performance with browser dev tools
+- [ ] Test contrast ratios for accessibility compliance
 
 ---
 
 ## 🚀 Future Considerations
 
 ### Planned Enhancements
-- Dark mode support (tokens already structured for this)
-- Custom color themes for different training phases
-- Enhanced animations and micro-interactions
+- Light mode toggle (maintaining BJJ theme with inverted colors)
+- Custom red/yellow accent themes for different belt levels
+- Enhanced animations with martial arts-inspired transitions
 - Progressive Web App (PWA) optimizations
 
 ### Recent Updates
-- **Exercise Description Visibility Fix**: Changed from colored backgrounds to transparent backgrounds with pure black text (#000000) for maximum contrast and readability
-- **Improved Exercise Information Layout**: Added `.exercise-info` container with flexbox column layout for better organization of exercise names and descriptions
-- **Enhanced Typography for Critical Information**: Used bold font weight and increased line-height (1.6) for exercise descriptions to ensure optimal readability during workouts
+- **Complete BJJ Blackbelt Theme Implementation**: Changed from blue theme to black, red, white, and yellow
+- **Dark Background with White Cards**: Floating card design for better content readability
+- **Enhanced Contrast**: Yellow buttons and red accents for optimal visibility
+- **Martial Arts Aesthetic**: Color choices reflect BJJ tradition and belt progression
 
 ### Maintenance Notes
 - Review and update design tokens quarterly
-- Monitor web performance metrics
+- Monitor web performance metrics with dark theme
 - Keep accessibility standards up to date
 - Consider user feedback for design iterations
+- Maintain consistent theme across all components
 
 ---
 
 *Last Updated: December 2024*
-*Version: 1.0* 
+*Version: 2.0 - BJJ Blackbelt Theme* 
