@@ -60,7 +60,7 @@ export function getApiKey() {
         import.meta.env?.VITE_GOOGLE_CLOUD_API_KEY ||
         window.GOOGLE_CLOUD_API_KEY ||
         localStorage.getItem('google-cloud-api-key') ||
-        'AIzaSyCwoDXjDlyqGcfPpUuhjfWaVyDOHOym-Ks' // Default API key
+        null // No default API key for security
     );
 }
 
