@@ -10,6 +10,8 @@ import {
     debounce,
     throttle 
 } from './utils/helpers.js';
+import TTSService from './utils/tts-service.js';
+import { TTS_CONFIG, getApiKey, setApiKey, validateApiKey, formatUsage, setServiceAccount, getServiceAccount, validateServiceAccount } from './config/tts-config.js';
 
 class ModernBJJWorkoutApp extends EventEmitter {
     constructor() {
@@ -36,16 +38,23 @@ class ModernBJJWorkoutApp extends EventEmitter {
                 voiceVolume: 0.8,
                 voiceRate: 0.9,
                 theme: 'light',
-                animations: true
+                animations: true,
+                googleTTSEnabled: true // Enable Google TTS by default
             }
         };
 
         // Timer and speech management
         this.timer = null;
-        this.speechSynthesis = window.speechSynthesis;
+        this.speechSynthesis = window.speechSynthesis; // Fallback
         this.speechQueue = [];
         this.isSpeaking = false;
         this.wakeLock = null;
+        
+        // Google Cloud TTS service (Free Tier)
+        console.log('Creating TTSService instance...');
+        this.ttsService = new TTSService();
+        console.log('TTSService created:', this.ttsService);
+        this.useGoogleTTS = false;
 
         // Event handlers (bound methods)
         this.handleResize = throttle(this.onResize.bind(this), 250);
@@ -58,27 +67,85 @@ class ModernBJJWorkoutApp extends EventEmitter {
 
     async init() {
         try {
+            console.log('=== APP INITIALIZATION START ===');
+            console.log('Starting app initialization...');
+            
             // Wait for DOM to be ready
             await this.waitForDOM();
+            console.log('DOM ready');
             
             // Initialize components
             this.initializeElements();
+            console.log('Elements initialized');
+            
             this.loadSettings();
-            this.bindEvents();
+            console.log('Settings loaded');
+            
+            console.log('About to call bindEvents()...');
+            try {
+                this.bindEvents();
+                console.log('Events bound successfully');
+            } catch (error) {
+                console.error('bindEvents() failed:', error);
+                throw error;
+            }
+            
             this.setupAccessibility();
             this.setupPerformanceOptimizations();
             this.populateExerciseLibrary();
             
             // Initialize speech synthesis
-            await this.initializeSpeech();
+            console.log('Initializing speech synthesis...');
+            try {
+                await this.initializeSpeech();
+                console.log('Speech synthesis initialized');
+            } catch (error) {
+                console.error('Speech synthesis initialization failed:', error);
+            }
+            
+            // Initialize Google Cloud TTS (Free Tier)
+            console.log('=== GOOGLE TTS INITIALIZATION START ===');
+            console.log('About to initialize Google TTS...');
+            console.log('TTS Service exists:', !!this.ttsService);
+            console.log('TTS Service type:', typeof this.ttsService);
+            console.log('About to call initializeGoogleTTS() method...');
+            try {
+                await this.initializeGoogleTTS();
+                console.log('Google TTS initialization completed');
+            } catch (error) {
+                console.error('Google TTS initialization failed:', error);
+            }
+            console.log('=== GOOGLE TTS INITIALIZATION END ===');
+            
+            // Update TTS status display
+            console.log('About to update TTS status...');
+            try {
+                this.updateTTSStatus();
+                console.log('TTS status updated successfully');
+            } catch (error) {
+                console.error('Failed to update TTS status:', error);
+            }
             
             // Setup PWA features
-            this.setupPWA();
+            console.log('Setting up PWA...');
+            try {
+                this.setupPWA();
+                console.log('PWA setup completed');
+            } catch (error) {
+                console.error('PWA setup failed:', error);
+            }
             
             // Emit ready event
-            this.emit('app:ready');
+            console.log('Emitting app:ready event...');
+            try {
+                this.emit('app:ready');
+                console.log('App ready event emitted');
+            } catch (error) {
+                console.error('Failed to emit app:ready event:', error);
+            }
             
             console.log('BJJ Workout App initialized successfully');
+            console.log('=== APP INITIALIZATION END ===');
         } catch (error) {
             console.error('Failed to initialize app:', error);
             this.showError('Failed to initialize the application');
@@ -161,105 +228,192 @@ class ModernBJJWorkoutApp extends EventEmitter {
     }
 
     bindEvents() {
-        // Day selection with enhanced animations
-        this.elements.dayButtons.forEach(btn => {
-            DOM.on(btn, 'click', (e) => {
-                const day = parseInt(btn.dataset.day);
-                this.selectDay(day);
-                animationManager.animateButtonPress(btn);
-            });
-        });
-
-        // Timer controls with haptic feedback
-        DOM.on(this.elements.startBtn, 'click', () => {
-            this.toggleWorkout();
-            this.hapticFeedback();
-        });
-
-        DOM.on(this.elements.resetBtn, 'click', () => {
-            this.resetWorkout();
-            this.hapticFeedback();
-        });
-
-        DOM.on(this.elements.backBtn, 'click', () => {
-            this.goBack();
-            this.hapticFeedback();
-        });
-
-        DOM.on(this.elements.skipBtn, 'click', () => {
-            this.skipExercise();
-            this.hapticFeedback();
-        });
-
-        if (this.elements.fullscreenBtn) {
-            // Use both DOM helper and direct addEventListener for reliability
-            DOM.on(this.elements.fullscreenBtn, 'click', () => {
-                console.log('Fullscreen button clicked via DOM helper');
-                this.toggleFullscreen();
-                this.hapticFeedback();
-            });
+        console.log('=== BIND EVENTS METHOD CALLED ===');
+        try {
+            console.log('Starting to bind events...');
             
-            // Also try direct event listener as backup
-            this.elements.fullscreenBtn.addEventListener('click', () => {
-                console.log('Fullscreen button clicked via direct listener');
-                this.toggleFullscreen();
+            // Day selection with enhanced animations
+            this.elements.dayButtons.forEach(btn => {
+                DOM.on(btn, 'click', (e) => {
+                    const day = parseInt(btn.dataset.day);
+                    this.selectDay(day);
+                    animationManager.animateButtonPress(btn);
+                });
+            });
+
+            // Timer controls with haptic feedback
+            DOM.on(this.elements.startBtn, 'click', () => {
+                this.toggleWorkout();
                 this.hapticFeedback();
             });
-        } else {
-            console.warn('Fullscreen button not found in DOM');
-            // Try to find it directly
-            const fullscreenBtn = document.getElementById('fullscreen-btn');
-            if (fullscreenBtn) {
-                console.log('Found fullscreen button directly, binding event');
-                fullscreenBtn.addEventListener('click', () => {
-                    console.log('Fullscreen button clicked via direct finder');
+
+            DOM.on(this.elements.resetBtn, 'click', () => {
+                this.resetWorkout();
+                this.hapticFeedback();
+            });
+
+            DOM.on(this.elements.backBtn, 'click', () => {
+                this.goBack();
+                this.hapticFeedback();
+            });
+
+            DOM.on(this.elements.skipBtn, 'click', () => {
+                this.skipExercise();
+                this.hapticFeedback();
+            });
+
+            if (this.elements.fullscreenBtn) {
+                // Use both DOM helper and direct addEventListener for reliability
+                DOM.on(this.elements.fullscreenBtn, 'click', () => {
+                    console.log('Fullscreen button clicked via DOM helper');
                     this.toggleFullscreen();
                     this.hapticFeedback();
                 });
-                // Update the cached element
-                this.elements.fullscreenBtn = fullscreenBtn;
+                
+                // Also try direct event listener as backup
+                this.elements.fullscreenBtn.addEventListener('click', () => {
+                    console.log('Fullscreen button clicked via direct listener');
+                    this.toggleFullscreen();
+                    this.hapticFeedback();
+                });
+            } else {
+                console.warn('Fullscreen button not found in DOM');
+                // Try to find it directly
+                const fullscreenBtn = document.getElementById('fullscreen-btn');
+                if (fullscreenBtn) {
+                    console.log('Found fullscreen button directly, binding event');
+                    fullscreenBtn.addEventListener('click', () => {
+                        console.log('Fullscreen button clicked via direct finder');
+                        this.toggleFullscreen();
+                        this.hapticFeedback();
+                    });
+                    // Update the cached element
+                    this.elements.fullscreenBtn = fullscreenBtn;
+                }
             }
-        }
 
-        // Settings with debounced handlers
-        DOM.on(this.elements.settingsBtn, 'click', () => {
-            this.toggleSettings();
-        });
-
-        // Settings inputs with real-time updates
-        Object.entries(this.elements.settingsInputs).forEach(([key, element]) => {
-            if (element) {
-                const handler = key.includes('voice') 
-                    ? debounce(() => this.saveSettings(), 300)
-                    : () => this.saveSettings();
-                DOM.on(element, 'change', handler);
-                DOM.on(element, 'input', handler);
-            }
-        });
-
-        // Modal events
-        if (this.elements.closeModalBtn) {
-            DOM.on(this.elements.closeModalBtn, 'click', () => this.closeModal());
-        }
-
-        if (this.elements.modal) {
-            DOM.on(this.elements.modal, 'click', (e) => {
-                if (e.target === this.elements.modal) this.closeModal();
+            // Settings with debounced handlers
+            DOM.on(this.elements.settingsBtn, 'click', () => {
+                this.toggleSettings();
             });
-        }
 
-        // Global event listeners
-        window.addEventListener('resize', this.handleResize, { passive: true });
-        document.addEventListener('visibilitychange', this.handleVisibilityChange);
-        document.addEventListener('keydown', this.handleKeydown);
-        document.addEventListener('fullscreenchange', this.handleFullscreenChange.bind(this));
-        document.addEventListener('webkitfullscreenchange', this.handleFullscreenChange.bind(this));
-        document.addEventListener('mozfullscreenchange', this.handleFullscreenChange.bind(this));
-        document.addEventListener('MSFullscreenChange', this.handleFullscreenChange.bind(this));
+            // Settings inputs with real-time updates
+            Object.entries(this.elements.settingsInputs).forEach(([key, element]) => {
+                if (element) {
+                    const handler = key.includes('voice') 
+                        ? debounce(() => this.saveSettings(), 300)
+                        : () => this.saveSettings();
+                    DOM.on(element, 'change', handler);
+                    DOM.on(element, 'input', handler);
+                }
+            });
 
-        // Touch/swipe gestures for mobile
-        if (DeviceUtils.isTouchDevice()) {
-            this.setupTouchGestures();
+            // Google Cloud TTS settings (Free Tier)
+            const googleTtsEnabled = DOM.$('#google-tts-enabled');
+            const googleApiKey = DOM.$('#google-api-key');
+            const googleVoiceSelect = DOM.$('#google-voice-select');
+            const saveGoogleTts = DOM.$('#save-google-tts');
+            const testGoogleTts = DOM.$('#test-google-tts');
+            const ttsStatus = DOM.$('#tts-status');
+            const usageDisplay = DOM.$('#tts-usage-display');
+            
+            // Authentication method controls
+            const authMethodRadios = DOM.$$('input[name="auth-method"]');
+            const apiKeySection = DOM.$('#api-key-section');
+            const serviceAccountSection = DOM.$('#service-account-section');
+            const serviceAccountFile = DOM.$('#service-account-file');
+            const serviceAccountPreview = DOM.$('#service-account-preview');
+
+            // Handle authentication method switching
+            authMethodRadios.forEach(radio => {
+                DOM.on(radio, 'change', () => {
+                    if (radio.value === 'api-key') {
+                        DOM.removeClass(apiKeySection, 'hidden');
+                        DOM.addClass(serviceAccountSection, 'hidden');
+                    } else {
+                        DOM.addClass(apiKeySection, 'hidden');
+                        DOM.removeClass(serviceAccountSection, 'hidden');
+                    }
+                });
+            });
+
+            // Handle service account file upload
+            if (serviceAccountFile) {
+                DOM.on(serviceAccountFile, 'change', (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        this.loadServiceAccountFile(file);
+                    }
+                });
+            }
+
+            if (googleTtsEnabled) {
+                DOM.on(googleTtsEnabled, 'change', () => this.saveGoogleTTSSettings());
+            }
+
+            if (saveGoogleTts) {
+                DOM.on(saveGoogleTts, 'click', () => this.saveGoogleTTSSettings());
+            }
+
+            if (testGoogleTts) {
+                DOM.on(testGoogleTts, 'click', () => this.testGoogleTTS());
+            }
+
+            // Load existing credentials if available
+            if (googleApiKey) {
+                const existingKey = getApiKey();
+                if (existingKey) {
+                    googleApiKey.value = existingKey;
+                }
+                
+                // Pre-fill with the provided API key if field is empty
+                if (!googleApiKey.value && existingKey) {
+                    googleApiKey.value = existingKey;
+                }
+            }
+
+            // Check if service account is already loaded
+            const existingServiceAccount = getServiceAccount();
+            if (existingServiceAccount) {
+                // Switch to service account method
+                const serviceAccountRadio = DOM.$('input[value="service-account"]');
+                if (serviceAccountRadio) {
+                    serviceAccountRadio.checked = true;
+                    DOM.removeClass(apiKeySection, 'hidden');
+                    DOM.addClass(serviceAccountSection, 'hidden');
+                    this.showServiceAccountPreview(existingServiceAccount);
+                }
+            }
+
+            // Modal events
+            if (this.elements.closeModalBtn) {
+                DOM.on(this.elements.closeModalBtn, 'click', () => this.closeModal());
+            }
+
+            if (this.elements.modal) {
+                DOM.on(this.elements.modal, 'click', (e) => {
+                    if (e.target === this.elements.modal) this.closeModal();
+                });
+            }
+
+            // Global event listeners
+            window.addEventListener('resize', this.handleResize, { passive: true });
+            document.addEventListener('visibilitychange', this.handleVisibilityChange);
+            document.addEventListener('keydown', this.handleKeydown);
+            document.addEventListener('fullscreenchange', this.handleFullscreenChange.bind(this));
+            document.addEventListener('webkitfullscreenchange', this.handleFullscreenChange.bind(this));
+            document.addEventListener('mozfullscreenchange', this.handleFullscreenChange.bind(this));
+            document.addEventListener('MSFullscreenChange', this.handleFullscreenChange.bind(this));
+
+            // Touch/swipe gestures for mobile
+            if (DeviceUtils.isTouchDevice()) {
+                this.setupTouchGestures();
+            }
+            
+            console.log('Events bound successfully');
+        } catch (error) {
+            console.error('Error binding events:', error);
+            throw error; // Re-throw to be caught by the main init method
         }
     }
 
@@ -1680,10 +1834,82 @@ class ModernBJJWorkoutApp extends EventEmitter {
         });
     }
 
+    // Initialize Google Cloud TTS (Free Tier)
+    async initializeGoogleTTS() {
+        try {
+            console.log('Initializing Google Cloud TTS...');
+            const apiKey = getApiKey();
+            console.log('API Key found:', !!apiKey);
+            
+            if (!apiKey) {
+                console.log('No Google Cloud API key found, using browser speech synthesis');
+                this.useGoogleTTS = false;
+                return;
+            }
+
+            if (!validateApiKey(apiKey)) {
+                console.warn('Invalid Google Cloud API key format');
+                this.useGoogleTTS = false;
+                return;
+            }
+
+            console.log('Initializing TTS service with API key...');
+            const success = await this.ttsService.initialize(apiKey);
+            this.useGoogleTTS = success;
+            console.log('TTS service initialization result:', success);
+            
+            if (success) {
+                console.log('Google Cloud TTS (Free Tier) initialized successfully');
+                // Update settings with Google TTS configuration
+                this.ttsService.updateSettings(this.state.settings);
+                
+                // Enable Google TTS in settings by default
+                this.setState({
+                    settings: {
+                        ...this.state.settings,
+                        googleTTSEnabled: true
+                    }
+                });
+                
+                // Update UI to show Google TTS is active
+                this.updateTTSStatus('Google Cloud TTS Active (Free Tier)', 'success');
+                this.updateUsageDisplay();
+            } else {
+                console.log('Google Cloud TTS failed to initialize, using browser speech synthesis');
+            }
+            
+        } catch (error) {
+            console.error('Error initializing Google Cloud TTS:', error);
+            this.useGoogleTTS = false;
+        }
+    }
+
     speak(text, priority = false) {
-        if (!this.state.settings.voiceEnabled || !this.speechSynthesis) {
+        if (!this.state.settings.voiceEnabled) {
             return;
         }
+
+        console.log('=== SPEAK DEBUG ===');
+        console.log('useGoogleTTS:', this.useGoogleTTS);
+        console.log('ttsService exists:', !!this.ttsService);
+        console.log('ttsService.isInitialized:', this.ttsService?.isInitialized);
+        console.log('googleTTSEnabled setting:', this.state.settings.googleTTSEnabled);
+        console.log('Text to speak:', text);
+
+        // Use Google Cloud TTS if available and enabled
+        if (this.useGoogleTTS && this.ttsService?.isInitialized && (this.state.settings.googleTTSEnabled !== false)) {
+            console.log('Using Google Cloud TTS:', text);
+            this.ttsService.speak(text, priority);
+            return;
+        }
+
+        // Fallback to browser speech synthesis
+        if (!this.speechSynthesis) {
+            console.warn('No speech synthesis available');
+            return;
+        }
+        
+        console.log('Using browser speech synthesis:', text);
         
         if (priority) {
             this.clearSpeech();
@@ -1730,6 +1956,12 @@ class ModernBJJWorkoutApp extends EventEmitter {
     }
 
     clearSpeech() {
+        // Clear Google Cloud TTS
+        if (this.useGoogleTTS && this.ttsService) {
+            this.ttsService.clearSpeech();
+        }
+        
+        // Clear browser speech synthesis
         if (this.speechSynthesis) {
             this.speechSynthesis.cancel();
         }
@@ -1831,7 +2063,214 @@ class ModernBJJWorkoutApp extends EventEmitter {
         this.setState({ settings: { ...this.state.settings, ...settings } });
         Storage.set('bjj-workout-settings', this.state.settings);
         
+        // Update Google TTS settings if available
+        if (this.useGoogleTTS && this.ttsService) {
+            this.ttsService.updateSettings(this.state.settings);
+        }
+        
         this.emit('settings:changed', this.state.settings);
+    }
+
+    // Save Google TTS settings (Free Tier)
+    saveGoogleTTSSettings() {
+        const googleTtsEnabled = DOM.$('#google-tts-enabled');
+        const authMethod = DOM.$('input[name="auth-method"]:checked')?.value || 'api-key';
+        const googleApiKey = DOM.$('#google-api-key');
+        const googleVoiceSelect = DOM.$('#google-voice-select');
+
+        if (!googleTtsEnabled) return;
+
+        const enabled = googleTtsEnabled.checked;
+        const selectedVoice = googleVoiceSelect?.value || 'en-US-Standard-A';
+
+        let credentials = null;
+
+        if (authMethod === 'api-key') {
+            const apiKey = googleApiKey?.value?.trim();
+            
+            if (enabled && !apiKey) {
+                this.updateTTSStatus('Please enter a Google Cloud API key', 'error');
+                return;
+            }
+
+            if (enabled && !validateApiKey(apiKey)) {
+                this.updateTTSStatus('Invalid API key format', 'error');
+                return;
+            }
+
+            credentials = apiKey;
+            setApiKey(apiKey);
+            setServiceAccount(null); // Clear service account
+        } else {
+            // Use service account
+            const serviceAccount = getServiceAccount();
+            if (enabled && !serviceAccount) {
+                this.updateTTSStatus('Please upload a service account JSON file', 'error');
+                return;
+            }
+            credentials = serviceAccount;
+            setApiKey(null); // Clear API key
+        }
+
+        // Update app settings
+        this.setState({
+            settings: {
+                ...this.state.settings,
+                googleTTSEnabled: enabled,
+                googleTTSAuthMethod: authMethod,
+                googleTTSVoice: selectedVoice
+            }
+        });
+
+        // Reinitialize TTS service
+        if (enabled && credentials) {
+            const initPromise = authMethod === 'api-key' 
+                ? this.ttsService.initialize(credentials)
+                : this.ttsService.initialize(null, credentials);
+                
+            initPromise.then(() => {
+                this.updateTTSStatus();
+                this.updateUsageDisplay();
+            });
+        } else {
+            this.ttsService.destroy();
+            this.updateTTSStatus('Browser TTS Active');
+        }
+
+        this.showToast('Google TTS settings saved', 'success');
+    }
+
+    loadServiceAccountFile(file) {
+        const reader = new FileReader();
+        
+        reader.onload = (e) => {
+            try {
+                const serviceAccount = JSON.parse(e.target.result);
+                
+                if (validateServiceAccount(serviceAccount)) {
+                    setServiceAccount(serviceAccount);
+                    this.showServiceAccountPreview(serviceAccount);
+                    this.showToast('Service account loaded successfully!', 'success');
+                } else {
+                    this.showToast('Invalid service account JSON file', 'error');
+                }
+            } catch (error) {
+                this.showToast('Failed to parse JSON file', 'error');
+            }
+        };
+        
+        reader.onerror = () => {
+            this.showToast('Failed to read file', 'error');
+        };
+        
+        reader.readAsText(file);
+    }
+
+    showServiceAccountPreview(serviceAccount) {
+        const preview = DOM.$('#service-account-preview');
+        if (preview) {
+            preview.innerHTML = `
+                <div class="bg-green-50 border border-green-200 rounded p-2">
+                    <div class="font-medium text-green-800">✓ Service Account Loaded</div>
+                    <div class="text-green-700">Project: ${serviceAccount.project_id}</div>
+                    <div class="text-green-700">Email: ${serviceAccount.client_email}</div>
+                </div>
+            `;
+            DOM.removeClass(preview, 'hidden');
+        }
+    }
+
+    // Test Google TTS (Free Tier)
+    async testGoogleTTS() {
+        if (!this.useGoogleTTS || !this.ttsService?.isInitialized) {
+            this.updateTTSStatus('Google TTS not available', 'error');
+            return;
+        }
+
+        try {
+            this.updateTTSStatus('Testing Google TTS...', 'info');
+            await this.ttsService.speak('This is a test of Google Cloud Text-to-Speech free tier. The voice quality should be much better than browser speech synthesis.', true);
+            this.updateTTSStatus('Google TTS test completed successfully', 'success');
+            this.updateUsageDisplay();
+        } catch (error) {
+            console.error('Google TTS test failed:', error);
+            this.updateTTSStatus('Google TTS test failed: ' + error.message, 'error');
+        }
+    }
+
+    // Update TTS status display
+    updateTTSStatus(message = null, type = 'info') {
+        const ttsStatus = DOM.$('#tts-status');
+        if (!ttsStatus) return;
+
+        if (!message) {
+            const status = this.getTTSStatus();
+            if (status.useGoogleTTS && status.isInitialized) {
+                message = 'Google TTS: Active and ready (Free Tier)';
+                type = 'success';
+            } else if (status.hasApiKey) {
+                message = 'Google TTS: API key configured but not active';
+                type = 'warning';
+            } else {
+                message = 'Google TTS: Not configured (using browser TTS)';
+                type = 'info';
+            }
+        }
+
+        const statusClasses = {
+            success: 'text-green-600 bg-green-100',
+            error: 'text-red-600 bg-red-100',
+            warning: 'text-yellow-600 bg-yellow-100',
+            info: 'text-gray-600 bg-gray-100'
+        };
+
+        ttsStatus.className = `text-xs p-2 rounded ${statusClasses[type] || statusClasses.info}`;
+        ttsStatus.textContent = `Status: ${message}`;
+    }
+
+    // Update usage display
+    updateUsageDisplay() {
+        const usageDisplay = DOM.$('#tts-usage-display');
+        if (!usageDisplay || !this.ttsService) return;
+
+        const usage = this.ttsService.getUsageInfo();
+        const remainingText = formatUsage(usage.remaining);
+        const usedText = formatUsage(usage.used);
+        
+        usageDisplay.innerHTML = `
+            <div class="text-xs text-gray-600">
+                <div class="flex justify-between mb-1">
+                    <span>Free Tier Usage:</span>
+                    <span>${usedText} / 4M characters</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div class="bg-blue-600 h-2 rounded-full" style="width: ${usage.percentage}%"></div>
+                </div>
+                <div class="text-xs text-gray-500 mt-1">
+                    ${remainingText} remaining this month
+                </div>
+            </div>
+        `;
+    }
+
+    // Get TTS status
+    getTTSStatus() {
+        try {
+            return {
+                useGoogleTTS: this.useGoogleTTS,
+                isInitialized: this.ttsService?.isInitialized || false,
+                hasApiKey: !!getApiKey(),
+                availableVoices: this.useGoogleTTS && this.ttsService ? this.ttsService.getAvailableVoices() : []
+            };
+        } catch (error) {
+            console.error('Error getting TTS status:', error);
+            return {
+                useGoogleTTS: false,
+                isInitialized: false,
+                hasApiKey: !!getApiKey(),
+                availableVoices: []
+            };
+        }
     }
 
     applySettingsToUI() {
@@ -1942,6 +2381,8 @@ class ModernBJJWorkoutApp extends EventEmitter {
         }
     }
 
+
+
     // Cleanup method
     destroy() {
         // Clear timers
@@ -1951,6 +2392,11 @@ class ModernBJJWorkoutApp extends EventEmitter {
         
         // Clear speech
         this.clearSpeech();
+        
+        // Clean up Google TTS service
+        if (this.ttsService) {
+            this.ttsService.destroy();
+        }
         
         // Release wake lock
         if (this.wakeLock) {
