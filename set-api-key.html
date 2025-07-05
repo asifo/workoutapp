@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Set API Key</title>
+</head>
+<body>
+    <h1>Set Google Cloud TTS API Key</h1>
+    <button onclick="setApiKey()">Set API Key in localStorage</button>
+    <button onclick="checkApiKey()">Check Current API Key</button>
+    <div id="result"></div>
+    
+    <script>
+        function setApiKey() {
+            const apiKey = 'AIzaSyAo6LiCFdwKkpgF9Q1I5xbGc4RmZPX5T04';
+            localStorage.setItem('google-cloud-api-key', apiKey);
+            window.GOOGLE_CLOUD_API_KEY = apiKey;
+            document.getElementById('result').innerHTML = '<p style="color: green;">✅ API Key set successfully!</p>';
+        }
+        
+        function checkApiKey() {
+            const localKey = localStorage.getItem('google-cloud-api-key');
+            const windowKey = window.GOOGLE_CLOUD_API_KEY;
+            
+            document.getElementById('result').innerHTML = `
+                <p>localStorage: ${localKey ? '✅ Set' : '❌ Not set'}</p>
+                <p>window: ${windowKey ? '✅ Set' : '❌ Not set'}</p>
+                ${localKey ? `<p>Key (first 10 chars): ${localKey.substring(0, 10)}...</p>` : ''}
+            `;
+        }
+    </script>
+</body>
+</html> 

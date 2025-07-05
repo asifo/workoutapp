@@ -55,6 +55,10 @@ class ModernBJJWorkoutApp extends EventEmitter {
         this.ttsService = new TTSService();
         console.log('TTSService created:', this.ttsService);
         this.useGoogleTTS = false;
+        
+        // Note: API key should be set via environment variables or localStorage
+        // For local development, you can set it manually in the browser console:
+        // localStorage.setItem('google-cloud-api-key', 'your-api-key-here');
 
         // Event handlers (bound methods)
         this.handleResize = throttle(this.onResize.bind(this), 250);

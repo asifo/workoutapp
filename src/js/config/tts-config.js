@@ -56,12 +56,18 @@ export const TTS_CONFIG = {
 
 // Helper function to get API key
 export function getApiKey() {
-    return (
-        import.meta.env?.VITE_GOOGLE_CLOUD_API_KEY ||
-        window.GOOGLE_CLOUD_API_KEY ||
-        localStorage.getItem('google-cloud-api-key') ||
-        null // No default API key for security
-    );
+    const envKey = import.meta.env?.VITE_GOOGLE_CLOUD_API_KEY;
+    const windowKey = window.GOOGLE_CLOUD_API_KEY;
+    const localKey = localStorage.getItem('google-cloud-api-key');
+    
+    console.log('🔍 API Key Debug:', {
+        envKey: envKey ? '✅ Found' : '❌ Not found',
+        windowKey: windowKey ? '✅ Found' : '❌ Not found',
+        localKey: localKey ? '✅ Found' : '❌ Not found',
+        envKeyValue: envKey ? `${envKey.substring(0, 10)}...` : 'null'
+    });
+    
+    return envKey || windowKey || localKey || null;
 }
 
 // Helper function to set API key

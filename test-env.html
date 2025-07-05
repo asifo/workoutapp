@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Environment Variable Test</title>
+</head>
+<body>
+    <h1>Environment Variable Test</h1>
+    <div id="result"></div>
+    
+    <script type="module">
+        const result = document.getElementById('result');
+        
+        console.log('🔍 Testing environment variables...');
+        console.log('import.meta.env:', import.meta.env);
+        console.log('VITE_GOOGLE_CLOUD_API_KEY:', import.meta.env?.VITE_GOOGLE_CLOUD_API_KEY);
+        
+        const apiKey = import.meta.env?.VITE_GOOGLE_CLOUD_API_KEY;
+        
+        if (apiKey) {
+            result.innerHTML = `
+                <p style="color: green;">✅ Environment variable found!</p>
+                <p>API Key (first 10 chars): ${apiKey.substring(0, 10)}...</p>
+                <p>Full length: ${apiKey.length} characters</p>
+            `;
+        } else {
+            result.innerHTML = `
+                <p style="color: red;">❌ Environment variable NOT found!</p>
+                <p>Available env vars: ${Object.keys(import.meta.env).filter(key => key.startsWith('VITE_')).join(', ')}</p>
+            `;
+        }
+    </script>
+</body>
+</html> 
