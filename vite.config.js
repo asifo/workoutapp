@@ -6,14 +6,14 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   
   return {
+    base: '/',
     root: '.',
     build: {
       outDir: 'dist',
-      sourcemap: true,
+      sourcemap: false,
       rollupOptions: {
         input: {
-          main: 'index.html',
-          modern: 'index-modern.html'
+          main: 'index.html'
         }
       }
     },
@@ -54,7 +54,8 @@ export default defineConfig(({ mode }) => {
             }
           ]
         },
-        includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
+        includeAssets: ['favicon.ico'],
+        skipWaiting: true,
         manifest: {
           name: 'BJJ Kettlebell Conditioning',
           short_name: 'BJJ Workout',
