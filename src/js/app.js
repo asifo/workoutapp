@@ -719,14 +719,21 @@ class ModernBJJWorkoutApp extends EventEmitter {
             container.appendChild(timerControls);
         }
         
-        // Make sure progress elements are accessible
+        // Make sure progress elements are accessible in fullscreen
         const progressContainer = DOM.$('.progress-container');
+        const progressText = DOM.$('#progress-text');
+        
         if (progressContainer && !container.contains(progressContainer)) {
             // Create a clone or ensure progress is visible
             const progressElements = container.querySelectorAll('.progress-bar, #progress-text');
             if (progressElements.length === 0) {
                 console.warn('Progress elements not found in timer container for fullscreen');
             }
+        }
+        
+        // Ensure progress text is updated immediately when entering fullscreen
+        if (progressText) {
+            this.updateWorkoutProgress();
         }
     }
 
@@ -1294,12 +1301,18 @@ class ModernBJJWorkoutApp extends EventEmitter {
                 return;
             }
             
+            // Update time remaining and phase elapsed time
+            const newPhaseElapsedTime = (Date.now() - this.state.phaseStartTime) / 1000;
+            
             this.setState({
                 timeRemaining: this.state.timeRemaining - 1,
-                phaseElapsedTime: (Date.now() - this.state.phaseStartTime) / 1000
+                phaseElapsedTime: newPhaseElapsedTime
             });
 
             this.updateDisplay();
+            
+            // Update progress every second for smooth animation
+            this.updateWorkoutProgress();
             
             // Countdown announcements with animations
             if (this.state.timeRemaining <= 5 && this.state.timeRemaining > 0) {
@@ -1339,8 +1352,7 @@ class ModernBJJWorkoutApp extends EventEmitter {
             );
         }
 
-        // Update progress
-        this.updateWorkoutProgress();
+        // Progress is now updated in the timer tick for smoother animation
     }
 
     updateWorkoutProgress() {
@@ -1348,18 +1360,86 @@ class ModernBJJWorkoutApp extends EventEmitter {
             return;
         }
 
-        const phase = this.state.currentWorkout.phases[this.state.currentPhase];
-        const phaseDurationSeconds = phase.duration * 60;
+        const progress = this.calculateWorkoutProgress();
+        
+        // Animate progress bar with overall workout progress
+        animationManager.animateProgress(this.elements.progressFill, progress.workoutProgress);
+        
+        // Update progress text with detailed breakdown
+        this.elements.progressText.textContent = progress.displayText;
+    }
+
+    calculateWorkoutProgress() {
+        if (!this.state.currentWorkout || this.state.currentPhase >= this.state.currentWorkout.phases.length) {
+            return { workoutProgress: 0, displayText: 'Workout complete' };
+        }
+
+        const currentPhase = this.state.currentWorkout.phases[this.state.currentPhase];
+        
+        // Calculate exercise progress within current round
+        const exerciseProgress = this.state.timeRemaining > 0 ? 
+            ((currentPhase.exercises[this.state.currentExercise].duration - this.state.timeRemaining) / 
+             currentPhase.exercises[this.state.currentExercise].duration) * 100 : 100;
+        
+        // Calculate round progress
+        const roundDuration = currentPhase.exercises.reduce((sum, ex) => sum + ex.duration, 0);
+        const completedRounds = Math.floor(this.state.phaseElapsedTime / roundDuration);
+        const currentRoundElapsed = this.state.phaseElapsedTime % roundDuration;
+        const currentRoundProgress = (currentRoundElapsed / roundDuration) * 100;
+        
+        // Calculate phase progress
+        const phaseDurationSeconds = currentPhase.duration * 60;
         const phaseProgress = Math.min((this.state.phaseElapsedTime / phaseDurationSeconds) * 100, 100);
         
-        // Animate progress bar
-        animationManager.animateProgress(this.elements.progressFill, phaseProgress);
+        // Calculate overall workout progress
+        let totalWorkoutDuration = 0;
+        let completedWorkoutTime = 0;
         
-        // Update progress text
+        for (let i = 0; i < this.state.currentWorkout.phases.length; i++) {
+            const phase = this.state.currentWorkout.phases[i];
+            const phaseDuration = phase.duration * 60;
+            totalWorkoutDuration += phaseDuration;
+            
+            if (i < this.state.currentPhase) {
+                completedWorkoutTime += phaseDuration;
+            } else if (i === this.state.currentPhase) {
+                completedWorkoutTime += this.state.phaseElapsedTime;
+            }
+        }
+        
+        const workoutProgress = totalWorkoutDuration > 0 ? 
+            Math.min((completedWorkoutTime / totalWorkoutDuration) * 100, 100) : 0;
+        
+        // Calculate remaining times
+        const exerciseTimeRemaining = this.state.timeRemaining;
         const phaseTimeRemaining = Math.max(0, phaseDurationSeconds - this.state.phaseElapsedTime);
-        const time = TimeUtils.formatTime(Math.floor(phaseTimeRemaining));
-        this.elements.progressText.textContent = 
-            `Phase ${this.state.currentPhase + 1}/${this.state.currentWorkout.phases.length} - ${time.display} remaining`;
+        const workoutTimeRemaining = Math.max(0, totalWorkoutDuration - completedWorkoutTime);
+        
+        // Format display text
+        const currentRound = completedRounds + 1;
+        const totalRounds = Math.ceil(phaseDurationSeconds / roundDuration);
+        const exerciseTimeFormatted = TimeUtils.formatTime(exerciseTimeRemaining);
+        const phaseTimeFormatted = TimeUtils.formatTime(Math.floor(phaseTimeRemaining));
+        const workoutTimeFormatted = TimeUtils.formatTime(Math.floor(workoutTimeRemaining));
+        
+        const displayText = `Exercise: ${exerciseTimeFormatted.display} | Round ${currentRound}/${totalRounds} | Phase ${this.state.currentPhase + 1}/${this.state.currentWorkout.phases.length}: ${phaseTimeFormatted.display} | Total: ${workoutTimeFormatted.display}`;
+        
+        return {
+            exerciseProgress,
+            currentRoundProgress,
+            phaseProgress,
+            workoutProgress,
+            displayText,
+            timeRemaining: {
+                exercise: exerciseTimeRemaining,
+                phase: phaseTimeRemaining,
+                workout: workoutTimeRemaining
+            },
+            roundInfo: {
+                current: currentRound,
+                total: totalRounds
+            }
+        };
     }
 
     updateProgress(percentage) {
@@ -1591,11 +1671,17 @@ class ModernBJJWorkoutApp extends EventEmitter {
                 box-shadow: 0 0 10px rgba(76, 175, 80, 0.4) !important;
             }
             
-            .timer-fullscreen .progress-text {
-                color: rgba(255, 255, 255, 0.7) !important;
+            .timer-fullscreen .progress-text,
+            .timer-fullscreen #progress-text {
+                color: rgba(255, 255, 255, 0.9) !important;
                 font-size: min(2.5vw, 18px) !important;
                 text-align: center !important;
                 margin-top: 1rem !important;
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+                max-width: 100% !important;
+                padding: 0 1rem !important;
             }
             
             .timer-fullscreen .timer-controls {
